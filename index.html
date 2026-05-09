@@ -1,0 +1,569 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tra cứu từ vựng</title>
+  <style>
+    :root {
+      --bg: #f7f2e8;
+      --paper: #fffaf1;
+      --ink: #2d241b;
+      --muted: #766a5a;
+      --line: rgba(76, 54, 35, .16);
+      --brand: #7d3f25;
+      --brand-2: #bd7a3e;
+      --green: #496846;
+      --shadow: 0 18px 40px rgba(70, 45, 20, .14);
+      --radius: 22px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: "Inter", "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 15% 0%, rgba(189,122,62,.18), transparent 30%),
+        radial-gradient(circle at 85% 10%, rgba(73,104,70,.16), transparent 26%),
+        var(--bg);
+      min-height: 100vh;
+    }
+
+    h1, h2, h3, .term, .modal-title {
+      font-variant-ligatures: none;
+      text-rendering: optimizeLegibility;
+      letter-spacing: normal;
+      word-spacing: normal;
+      overflow-wrap: normal;
+      word-break: normal;
+    }
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(18px);
+      background: rgba(247, 242, 232, .82);
+      border-bottom: 1px solid var(--line);
+    }
+    .nav {
+      max-width: 1180px;
+      margin: auto;
+      padding: 14px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      letter-spacing: .2px;
+    }
+    .logo-mark {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      background: linear-gradient(135deg, var(--brand), var(--brand-2));
+      box-shadow: 0 10px 24px rgba(125,63,37,.28);
+    }
+    .nav a {
+      color: var(--muted);
+      text-decoration: none;
+      font-weight: 600;
+      margin-left: 18px;
+    }
+    .hero {
+      max-width: 1180px;
+      margin: auto;
+      padding: 54px 20px 32px;
+      display: grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 28px;
+      align-items: center;
+    }
+    .eyebrow {
+      color: var(--brand);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .14em;
+      font-size: 13px;
+    }
+    h1 {
+      font-family: "Segoe UI", Arial, Helvetica, sans-serif;
+      font-size: clamp(38px, 5.4vw, 70px);
+      line-height: 1.08;
+      letter-spacing: -0.035em;
+      word-spacing: 0;
+      margin: 12px 0 18px;
+    }
+    .hero p {
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1.75;
+      max-width: 720px;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 26px;
+    }
+    .stat {
+      background: rgba(255,250,241,.72);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 18px;
+    }
+    .stat b { display: block; font-size: 28px; }
+    .stat span { color: var(--muted); font-size: 13px; }
+    .hero-card {
+      min-height: 360px;
+      border-radius: 34px;
+      background:
+        linear-gradient(135deg, rgba(125,63,37,.90), rgba(73,104,70,.88)),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cg fill='none' stroke='%23fff' stroke-opacity='.15'%3E%3Cpath d='M0 60h180M0 120h180M60 0v180M120 0v180'/%3E%3Ccircle cx='90' cy='90' r='52'/%3E%3C/g%3E%3C/svg%3E");
+      color: white;
+      box-shadow: var(--shadow);
+      padding: 34px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      overflow: hidden;
+      position: relative;
+    }
+    .hero-card:before {
+      content: "";
+      position: absolute;
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.15);
+      right: -70px;
+      top: -60px;
+    }
+    .hero-card h2 {
+      font-family: "Segoe UI", Arial, Helvetica, sans-serif;
+      font-size: 34px;
+      line-height: 1.15;
+      letter-spacing: -0.025em;
+      word-spacing: 0;
+      margin: 0 0 10px;
+      position: relative;
+    }
+    .hero-card p { color: rgba(255,255,255,.82); margin: 0; position: relative; }
+    .section {
+      max-width: 1180px;
+      margin: auto;
+      padding: 22px 20px 70px;
+    }
+    .toolbar {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 14px;
+      align-items: center;
+      background: rgba(255,250,241,.78);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 14px;
+      box-shadow: 0 12px 30px rgba(70,45,20,.08);
+      margin-bottom: 22px;
+    }
+    .search {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: #fff;
+      padding: 12px 14px;
+    }
+    .search input {
+      width: 100%;
+      border: 0;
+      outline: 0;
+      font-size: 16px;
+      background: transparent;
+      color: var(--ink);
+    }
+    .filters { display: flex; flex-wrap: wrap; gap: 8px; }
+    button {
+      border: 0;
+      cursor: pointer;
+      font: inherit;
+    }
+    .chip {
+      border-radius: 999px;
+      padding: 11px 14px;
+      background: #fff;
+      border: 1px solid var(--line);
+      color: var(--muted);
+      font-weight: 700;
+    }
+    .chip.active {
+      color: #fff;
+      background: var(--brand);
+      border-color: var(--brand);
+    }
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      color: var(--muted);
+      margin: 18px 4px;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .card {
+      border: 1px solid var(--line);
+      background: rgba(255,250,241,.88);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: 0 10px 26px rgba(70,45,20,.08);
+      min-height: 238px;
+      display: flex;
+      flex-direction: column;
+      transition: transform .18s ease, box-shadow .18s ease;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 36px rgba(70,45,20,.13);
+    }
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .badge {
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--green);
+      background: rgba(73,104,70,.12);
+    }
+    .no { color: var(--muted); font-size: 13px; }
+    .term {
+      font-family: "Segoe UI", Arial, Helvetica, sans-serif;
+      font-size: 26px;
+      line-height: 1.18;
+      margin: 0 0 12px;
+    }
+    .desc {
+      color: var(--muted);
+      line-height: 1.65;
+      display: -webkit-box;
+      -webkit-line-clamp: 5;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      white-space: pre-line;
+      margin-bottom: 18px;
+      flex: 1;
+    }
+    .more {
+      align-self: flex-start;
+      border-radius: 999px;
+      background: transparent;
+      color: var(--brand);
+      font-weight: 800;
+      padding: 0;
+    }
+    .empty {
+      display: none;
+      text-align: center;
+      padding: 50px 18px;
+      color: var(--muted);
+      background: rgba(255,250,241,.70);
+      border: 1px dashed var(--line);
+      border-radius: var(--radius);
+    }
+    .pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      margin-top: 28px;
+    }
+    .page-btn {
+      border-radius: 14px;
+      background: #fff;
+      border: 1px solid var(--line);
+      padding: 12px 16px;
+      color: var(--ink);
+      font-weight: 800;
+    }
+    .page-btn:disabled { opacity: .45; cursor: not-allowed; }
+    dialog {
+      border: 0;
+      border-radius: 26px;
+      padding: 0;
+      width: min(780px, calc(100vw - 28px));
+      background: #fffaf1;
+      color: var(--ink);
+      box-shadow: 0 35px 80px rgba(0,0,0,.28);
+    }
+    dialog::backdrop { background: rgba(31,24,18,.55); backdrop-filter: blur(4px); }
+    .modal-head {
+      padding: 24px 26px 16px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+    }
+    .modal-title {
+      font-family: "Segoe UI", Arial, Helvetica, sans-serif;
+      font-size: 36px;
+      margin: 0;
+    }
+    .close {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: rgba(125,63,37,.1);
+      color: var(--brand);
+      font-size: 22px;
+    }
+    .modal-body { padding: 24px 26px 28px; line-height: 1.8; white-space: pre-line; color: #45392c; }
+    .footer {
+      text-align: center;
+      padding: 34px 20px 48px;
+      color: var(--muted);
+      border-top: 1px solid var(--line);
+    }
+    mark {
+      background: rgba(189,122,62,.25);
+      color: inherit;
+      border-radius: 4px;
+      padding: 0 2px;
+    }
+    @media (max-width: 900px) {
+      .hero { grid-template-columns: 1fr; padding-top: 38px; }
+      .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .toolbar { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 620px) {
+      .nav-links { display: none; }
+      .stats { grid-template-columns: 1fr; }
+      .grid { grid-template-columns: 1fr; }
+      .hero-card { min-height: 260px; }
+      .term { font-size: 24px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <nav class="nav">
+      <div class="logo"><div class="logo-mark">字</div><span>Thư viện từ vựng</span></div>
+      <div class="nav-links">
+        <a href="#search">Tra cứu</a>
+        <a href="#data">Dữ liệu</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div>
+        <div class="eyebrow">Kho ngữ liệu NNH</div>
+        <h1>Tra cứu nhóm từ vựng chỉ phương tiện giao thông theo dòng lịch sử trong Tiếng Việt</h1>
+        <p>Trang web tra cứu nhanh theo từ khóa, nhóm dữ liệu và nguồn trích dẫn.</p>
+        <div class="stats">
+          <div class="stat"><b id="totalTerms">183</b><span>Từ vựng</span></div>
+          <div class="stat"><b>3</b><span>Nhóm dữ liệu</span></div>
+          <div class="stat"><b>293</b><span>Số liệu nguồn</span></div>
+        </div>
+      </div>
+      <aside class="hero-card">
+        <h2>Từ điển trực tuyến</h2>
+        <p>Giao diện lấy cảm hứng từ mẫu website thư viện từ điển</p>
+      </aside>
+    </section>
+
+    <section id="search" class="section">
+      <div class="toolbar">
+        <label class="search" aria-label="Tìm kiếm">
+          <span>🔎</span>
+          <input id="q" type="search" placeholder="Nhập từ khóa, ví dụ: thuyền, bè, xuồng..." autocomplete="off" />
+        </label>
+        <div class="filters" id="filters"></div>
+      </div>
+
+      <div class="meta-row">
+        <div id="resultInfo">Đang hiển thị dữ liệu...</div>
+        <div>Sắp xếp: A → Z theo từ vựng</div>
+      </div>
+
+      <div id="data" class="grid"></div>
+      <div id="empty" class="empty">Không tìm thấy kết quả phù hợp.</div>
+      <div class="pagination">
+        <button class="page-btn" id="prev">‹ Trước</button>
+        <span id="pageInfo"></span>
+        <button class="page-btn" id="next">Sau ›</button>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="detail">
+    <div class="modal-head">
+      <div>
+        <div class="badge" id="modalGroup">Nhóm</div>
+        <h3 class="modal-title" id="modalTerm"></h3>
+      </div>
+      <button class="close" id="closeModal" aria-label="Đóng">×</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </dialog>
+
+  <footer class="footer">© Tra cứu từ vựng • HTML/CSS/JavaScript thuần</footer>
+
+  <script>
+    const DATA = [{"stt": 1, "term": "Bè", "group": "1", "source": ". Bè là những khối hình tấm gồm nhiều thân cây (tre, nứa, gỗ, v.v.) được kết lại, tạo thành vật nổi ổn định để di chuyển đi hoặc dùng làm phương tiện vận chuyển trên sông nước (Từ điển Hoàng Phê : 2022, tr.67)\n. Bè là phương tiện được kết ghép lại bằng tre, nứa, gỗ hoặc các vật nổi khác để chuyển đi hoặc dùng làm phương tiện vận chuyển tạm thời trên đường thuỷ nội địa.(Luật Giao thông đường thủy nội địa 2004 số 23/2004/QH11)", "count": 2}, {"stt": 2, "term": "Bè thủy lục", "group": "3", "source": ". Bè thủy lục là một loại thuyền chiến hạng trung, đóng bằng gỗ, liên kết bằng đinh sắt, có buồm và nhiều mái chèo, có hai đáy (bụng): đáy trên chở lương thực, vũ khí hoặc lính chiến đấu; đáy dưới dành riêng cho phu chèo thuyền, chủ yếu dùng để vận tải. (Từ điển từ ngữ Nam bộ, Huỳnh Công Tín, tr.157)", "count": 1}, {"stt": 3, "term": "Bè tre", "group": "1", "source": ". Bè tre là phương tiện nổi đơn giản làm từ nhiều cây tre tươi được ghép chặt lại thành tấm phẳng để di chuyển trên sông nước.\nBè thường dài 3-4m, rộng 0.3m, dùng tre già khỏe buộc bằng dây mây hoặc đinh sắt, có thể chèo tay hoặc dùng sào đẩy.Nó nổi tốt nhờ tre chứa không khí, chịu lực tốt, dễ đóng và rẻ tiền, phù hợp cho ngư dân hoặc vận chuyển hàng hóa nhẹ.", "count": 1}, {"stt": 4, "term": "Bộ Liễn", "group": "3", "source": ". Bộ liễn là kiệu của Thái tử. Lỗ bộ tháp tùng gồm có 1 cờ lệnh, 2 cờ xanh, 2 cờ đỏ, 2 cờ vàng, 2 cờ trắng, 2 cờ đen, 8 lá cờ phướn, 1 chiếc tán hình tròn thêu hình 7 con rồng, 4 chiếc tán hình vuông, 4 chiếc lọng màu đỏ, 6 lọng màu xanh vẽ rồng mây.(Đại Việt sử quán).", "count": 1}, {"stt": 5, "term": "Cáng", "group": "3", "source": ". Cáng là võng mắc vào đòn, có mui che, thời trước dùng để khiêng người.(Từ điển tiếng Việt).", "count": 1}, {"stt": 6, "term": "Cầu phao", "group": "3", "source": ". Cầu phao là cầu ghép nổi trên mặt nước nhờ các phao hoặc vật nổi.(Từ điển tiếng Việt).", "count": 1}, {"stt": 7, "term": "Chu thuyền - Ghe chu", "group": "3", "source": ". Chu thuyền là một phiên bản của Ô thuyền nhưng sơn đỏ thay vì sơn đen (Thần Long kích thủy - Lịch sử thuyền chiến Việt Nam, Đông Nguyễn, 2025, tr.173)", "count": 1}, {"stt": 8, "term": "Cổ lâu thuyền", "group": "3", "source": ". Cổ lâu thuyền được Hồ Hán Thương chế tạo năm 1404, trên cơ sở kế thừa và phát triển kỹ thuật đóng thuyền lầu (lâu thuyền) bằng việc đặt súng Thần Cơ trên thuyền. Để đảm bảo bí mật, những thuyền này được ngụy trang như loại thuyền tải lương, với những tên như Trung tàu tải lương, Cổ lâu thuyền tải lương.(Âm vang sử Việt)\n. Cổ lâu thuyền loại thuyền chiến lớn đóng đinh sắt, có hai tầng boong với hàng chục tay chéo và hai người điều khiển một mái chèo, có tên gọi là Trung tàu tải lương, Cổ lâu thuyền tải lương, để chở lương nhưng cũng sẵn sàng chiến đấu.(Bảo tàng lịch sử Quốc gia)", "count": 2}, {"stt": 9, "term": "Đa sách thuyền", "group": "3", "source": ". Đa sách thuyền (hay đa tác thuyền) là loại thuyền chiến lớn thời nhà Nguyễn, được đóng theo kiểu Tây phương với đặc trưng \"nhiều dây\" ám chỉ hệ thống nhiều cánh buồm, cột buồm và dây điều khiển phức tạp.(Theo Đại Việt Sử Quán).\n. Đa sách thuyền là loại thuyền có nhiều cánh buồm và cột buồm. (Báo biên phòng: Những chiến thuyền bảo vệ biển, đảo thời Nguyễn).\n. Đa Sách Thuyền là tàu biển cũng được. Thuyền loại này dùng đi biển, sông lớn và vượt cả đại dương, đi được xa lâu ngày. (Báo biên phòng: Những chiến thuyền bảo vệ biển, đảo thời Nguyễn).", "count": 3}, {"stt": 10, "term": "Đa tác thuyền", "group": "3", "source": ". Đa tác thuyền hay thuyền nhiều dây, loại thuyền đóng theo kiểu tây thời Nguyễn.(Đại Việt sử quán).\n. Đa Tác Thuyền trong Đại Nam thực lục còn được gọi là tàu bọc đồng, tàu có số lượng thủy thủ ước chừng là 300 người, tổng số quân phục vụ trên toàn bộ các tàu loại này được ghi lại là 1200 người. Số lượng pháo được trang bị mỗi chiếc không có ghi chép xác thực, ước đoán chừng 40 khẩu. \nLoại thuyền này được khắc trên Cửu Đỉnh trong hoàng thành Huế.(Đại Việt sử quán).", "count": 2}, {"stt": 11, "term": "Đại hiệu thuyền (Thần Long kích thủy - tr.187)", "group": "3", "source": ". Đại hiệu thuyền (大號船) là thuật ngữ chỉ các loại thuyền chiến có quy mô lớn hoặc được phân loại vào hạng quan trọng, thường xuất hiện trong các tài liệu lịch sử hoặc hệ thống phân loại tàu thuyền thời phong kiến (đặc biệt là thời Lê - Nguyễn).Những chiếc thuyền này thường có kết cấu vững chãi, được trang bị vũ khí mạnh hơn so với các loại thuyền chiến nhỏ, thuyền mành hay thuyền giã. (Báo Văn hoá).", "count": 1}, {"stt": 12, "term": "Đằng Huy", "group": "3", "source": ". Đằng Huy là chiếc tàu bọc đồng thứ 3 mua từ nước ngoài đã được đưa vào cửa biển Thuận An.(Tạ chí khoa học Tàu thủy công nghiệp Việt Nam)\n. Tàu dài 7 trượng 2 thước 9 tấc 5 phân, rộng 1 trượng 5 thước 1 tấc; sâu 7 thước 9 tấc 5 phân. Trị giá 72.824 đồng bạc (mỗi đồng bạc trị giá 5 quan 5 tiền). (Tạp chí khoa học Tàu thủy công nghiệp Việt Nam.)", "count": 2}, {"stt": 13, "term": "Đấu thuyền", "group": "3", "source": ". Đấu thuyền là hạm thuyền lớn chỉ huy, với cột cờ soái và nhiều cờ xí, xung phong chiến đấu, dẫn đầu đoàn chiến thuyền.(Bảo tàng lịch sử Quốc gia).", "count": 1}, {"stt": 14, "term": "Điện hải thuyền", "group": "3", "source": ". Điện hải (giữ vững biển) là một loại thuyền buồm đi biển, sử dụng trong cả vận tải và chiến đầu thời Nguyễn, tên loại thuyền này xuất hiện lần đầu trong các văn bản thời Minh Mạng (Thần Long kích thủy - Lịch sử thuyền chiến Việt Nam, Nguyên Đông, 2025, tr. 193). \n. Thuyền Điện hải là kiểu thuyền vốn dùng bánh lái xiên, nay tại kinh mới tạo ra các thuyền đổi làm bánh lái thẳng đứng, khi di chuyển thấy ổn thỏa nhanh nhẹn, sai Bộ chiếu theo thứ dạng thức cải tạo đó (Khâm định Đại Nam hội điển sự lệ, quyển nhị bách thập bát - thuyền chính, Quốc sử quán triều Nguyễn).", "count": 2}, {"stt": 15, "term": "Đĩnh", "group": "3", "source": ". Đĩnh là một dạng thuyền dài mà hẹp, mớn nước nông và chạy nhanh (Thần Long kích thủy - Lịch sử thuyền chiến Việt Nam, Nguyễn Đông, 2025) . Thuyền Đĩnh là dạng thuyền dài , có nhiều người chèo, thường đi sau để hộ tống thuyền ngự của vua (Ngành đóng thuyền và tàu thuyền ở Việt Nam thời Nguyễn, Trần Đức Anh Sơn, 2014, tr.61)", "count": 2}, {"stt": 16, "term": "Định Quốc đại hiệu", "group": "3", "source": ". Định quốc đại hiệu (thuyền lớn định quốc) là kiểu thuyền lớn nhất trong thủy quân Tây Sơn. Định quốc là tên thuyền, còn đại hiệu nghĩa là thuyền lớn. Trong trận chiến Thị Nại năm 1801, quân Tây Sơn dưới quyền Võ Văn Dũng đã dùng hai thuyền này cùng hơn trăm thuyền chiến chặn cửa vào đầm (Thần Long kích thủy - lịch sử thuyền chiến Việt Nam, Đông Nguyễn, 2025, tr.182)", "count": 1}, {"stt": 17, "term": "Đò", "group": "1", "source": ". Đò là thuyền nhỏ chở khách trên sông nước theo những tuyến nhất định.(Từ điển tiếng Việt).", "count": 1}, {"stt": 18, "term": "Du Đĩnh thuyền", "group": "3", "source": ". Du Đĩnh thuyền là thuyền có nhiều tầng to cao, trên có mái che với hàng dọc cờ xí, chứa được nhiều quân cung thủ, quan sát giặc từ xa, lợi hại khi đổ bộ binh đánh úp.(Bảo tàng Lịch sử Quốc gia).", "count": 1}, {"stt": 19, "term": "Ghe", "group": "1", "source": ". Ghe là thuyền gỗ có mui (Từ điển Hoàng Phê: 2022, tr.477)", "count": 1}, {"stt": 20, "term": "Ghe bản lồng", "group": "3", "source": ". Ghe bản lồng là thuyền có mui vuông dùng để đi trên sông ở một số địa phương (Từ điển Hoàng Phê: 2022, tr.477)", "count": 1}, {"stt": 21, "term": "Ghe bất mãn", "group": "3", "source": ". Ghe bất mãn là một loại ghe sông thấp thước, không hạp lệ, bị bắt không thâu thuế (thể lệ xưa) (Vương Hồng Sển, Tự vị tiếng nói miền Nam, tr.361)", "count": 1}, {"stt": 22, "term": "Ghe bầu - Biều thuyền", "group": "2", "source": ". Ghe bầu là thuyền lớn, hình quả dưa, mũi cao, chạy bằng buồm, dùng để đi trong sông ở một số địa phương (Từ điển Hoàng Phê: 2022, tr.477) \n. Ghe bầu, tên chữ là biều thuyền (thuyền trái bầu) là một loại thuyền buồm chỏ hàng, thuyền buồm của khu vực Nam Trung Bộ và Nam Bộ, được Tây Sơn và chúa Nguyễn Ánh sử dụng vào vận tải quân lương đường biển. (Thần Long kích thủy - Lịch sử thuyền chiến Việt Nam, Đông Nguyễn, 2025, tr.178).\n. Ghe bầu là loại thuyền lớn, hình quả dưa, mũi cao, chạy bằng buồm, dùng để đi biển.(Từ điển tiếng Việt).\n. Ghe bầu là loại ghe lớn nhất, mũi và lái nhọn, bụng phình to, có tải trọng tương đối lớn, chạy buồm (từ 1 đến 3 buồm), lướt sóng tốt và đi nhanh, có nhiều chèo để đi sông và đi biển dài ngày.thường dùng đi đường biển. Loại ghe bầu lớn thường gọi là ghe trường đà.Ghe bầu (Prau) bắt nguồn từ tiếng Mã Lai, do người Việt trong quá trình Nam tiến tiếp thu được của người Chăm.Trước năm 1945, hàng năm các lái buôn lớn từ miền Trung chở cá, mắm cá mòi, chủ yếu là nước mắm cá cơm của vùng Phan Thiết vào bán trong Nam, rồi mua gạo thóc chở ra bằng loại ghe này.(Nguyễn Thanh Lợi, Tạp chí Văn hóa dân gian, số 1, 2005). \n. Ghe bầu là loại ghe được đóng có phần giữa phình ra, (nhiều ghe có phần bụng phình ra khá lớn khiến cho chiêu dài ghe dường như ngắn lại, gọi là \"bầu nóc\".), được dùng đi lại trên những sông, kênh lớn. \"ánh đi mười tám nưóc ghe bẩu, Không nghe ai ăn nói thẩm sầu như em. (cd)\" (Từ điển từ ngữ Nam bộ, Huỳnh Công Tín, tr.542)", "count": 5}, {"stt": 23, "term": "Ghe bầu Hội An", "group": "2", "source": ". Ghe bầu Hội An là loại ghe có trọng tải rất lớn, từ 50 -150 tấn. Người ta nhận ra nó từ xa nhờ đuôi tàu với ba vòng đai mạn thuyền, sắp xếp trên dưới đường cong sàn ghe (Ghe xuồng Nam Bộ - Nguyễn Thanh Lợi).", "count": 1}, {"stt": 24, "term": "Ghe be", "group": "1", "source": ". Ghe be là loại ghe có cơi thêm ván :hai bên mạn để chở được nhiều hơn. \" Mấy chiếc ghe be nay coi vậy chó chở được nhiều lắm đó.\" (Từ điển từ ngữ Nam bộ, Huỳnh Công Tín, tr.542)", "count": 1}, {"stt": 25, "term": "Ghe bè", "group": "2", "source": ". Ghe bè là loại ghe to và sâu, giống như chiếc xà lan, có mái che, tải trọng lớn, người chèo có thể đi lại trên mui, dùng chuyên chở hàng hóa trên sông. Loại ghe to, mau bán tận Campuchia.(Nguyễn Thanh Lợi, Tạp chí Văn hóa dân gian, số 1, 2005). . Ghe bè là loại ghe lớn đóng theo kiểu nhà ở, chở được nhiều hàng hóa, xưa lên bán Nam Vang, có mũi vững chắc, người chèo chống đi được trên mui ấy như đi trên đất bằng và thường tụ tập nhau lại thành đoàn, đến trở lên danh xứ: Cái bè, Nhà bè (Vương Hồng Sển, Tự vị tiếng nói miền Nam, tr.361) . Ghe bè là ghe được đóng theo kiểu sà lan, có mui, dùng chuyên chở nặng. \" Ghe bè đóng bằng cây theo kiểu xà lan, trong toan thân chứa toan hàng hoá, có mui bao phú, người chèo chống đi tới lui trên mui. (Từ điển từ ngữ Nam bộ, Huỳnh Công Tín, tr.542)", "count": 3}, {"stt": 26, "term": "Ghe be không mui", "group": "2", "source": ". Ghe be không mui là một dạng ghe lớn dùng để chở hàng hóa trên sông, phổ biến ở Nam Bộ, đặc trưng là không có mui (hay chỉ có mui rất nhỏ, chệch về phía lái) và thường được gắn thêm hai chiếc ghe nhỏ hai bên sườn để tăng sức chở. (Ghe xuồng Nam Bộ - Nguyễn Thanh Lợi)", "count": 1}, {"stt": 27, "term": "Ghe buôn", "group": "1", "source": ". Ghe buôn là ghe chuyên dùng để buôn bán hàng sỉ, lẻ lưu động trên sông, rạch, một phương tiện buôn bán mang tính đặc thủ của vùng đồng bằng sông nước. \"Có thương thì thương cho chốc, Có bỏ thì bỏ cho luôn, Đừng theo cái thói ghe buôn, khi vui thì ở, khi buồn thì đi. (Từ điển từ ngữ Nam bộ, Huỳnh Công Tín, tr.543)", "count": 1}, {"stt": 28, "term": "Ghe cá - Ghe rỗi", "group": "3", "source": ". Ghe cá hay còn gọi là ghe rỗi là một loại ghe chuyên chở sá đồng từ miền Tây về Sài Gòn. Đặc biệt mực nước trong ghe luôn cân bằng với mực nước sông bên ngoài để giữ cá luôn sống và ghe cũng luôn vững. “Anh đi ghe cá mũi son, để em đan đệm cho mòn mười ngón tay” (Nguyễn Thanh Lợi, Tạp chí Văn hóa dân gian, số 1, 2005) . Ghe cá là ghe chở cá đồng (Vương Hồng Sển, Tự vị tiếng nói miền Nam, tr.361) . Ghe cá hay ghe rỗi là loại ghe chuyên để chở cá đi bán. (Từ điển từ ngữ Nam bộ, Huỳnh Công Tín, tr.545)", "count": 3}, {"stt": 29, "term": "Ghe cà vòm", "group": "3", "source": ". Ghe cà vòm là loại ghe nhỏ, dài, có mui nhỏ nhưng khác ghe lườn và ghe ngo. (Nguyễn Thanh Lợi, Tạp chí Văn hóa dân gian, số 1, 2005)", "count": 1}, {"stt": 30, "term": "Ghe cào", "group": "2", "source": ". Ghe cào là loại ghe chuyên dùng để đánh bắt thuỷ sản ngoài khơi. (Từ điển từ ngữ Nam bộ, Huỳnh Công Tín, tr.543)", "count": 1}, {"stt": 31, "term": "Ghe câu", "group": "3", "source": ". Ghe câu là ghe dùng khi đi câu cá (Vương Hồng Sển, Tự vị tiếng nói miền Nam, tr.361)", "count": 1}, {"stt": 32, "term": "Ghe chài", "group": "1", "source": ". Ghe chài là loại ghe to và chở được trọng lượng lớn, có mui rất kiên cố, gồm nhiều mảnh gỗ ghép lại, có hai tầng. Ghe được chia làm hai phần, phần đầu chứa hàng hóa, phần sau là chỗ nghỉ cho người đi ghe.Một mui rời phía sau phòng lái dùng làm nơi tắm rửa, nấu cơm. Ghe có sức chở từ 150-200 tấn, loại ghe chài Nam Vang chở được đến 300 tấn. Ghe chài thường có cả chục người chèo với kiểu chèo “neo” ngược chứ không như kiểu chèo ghe bình thường. Về sau, người ta dùng tàu kéo ghe chài. Ghe dùng cho người đi buôn bán xa, dài ngày và sống trên sông nước. Thường dùng chở lúa gạo, than củi.(Nguyễn Thanh Lợi, Tạp chí Văn hóa dân gian, số1, 2005).\n. Ghe chài là loại ghe tải, ghe to và dài, có mui, có buông để điểu khiển bánh lái ở trên mui, thường không có động cơ, nên ghe được đẩy bằng tàu chuyên dùng để kéo hoặc đẩy, ghe chài chủ yếu là phương tiện dùng để chuyên chở hàng hoá, nông sản. \"Đờng ham hốt bạc ghe chải, Cột buôm cao, bao lúa nặng, tấm đòn dài khó di. (Từ điển từ ngữ Nam bộ, Huỳnh Công Tín, tr.543)", "count": 2}, {"stt": 33, "term": "Ghe chiến", "group": "3", "source": ". Ghe chiến là loại ghe giàn trận, ghe đánh giặc (Vương Hồng Sển, Tự vị tiếng nói miền Nam, tr.361)", "count": 1}, {"stt": 34, "term": "Ghe cửa", "group": "3", "source": ". Ghe cửa là thuyền gỗ, mũi và lái nhọn, dùng để đi vùng ven biển, cửa sông ở một số địa phương (Từ điển Hoàng Phê: 2022, tr.477). \n. Ghe cửa là ghe nhọn mũi mà nhỏ, thường dùng đi theo cửa biển (Vương Hồng Sển, Tự vị tiếng nói miền Nam, tr.361).\n. Ghe cửa là loại ghe nhỏ, mũi nhọn, nhảy sóng tốt, chạy buồm vững vàng; có thể ra vào các cửa sông dễ dàng, hay chở hàng đi men theo bờ biển. (Nguyễn Thanh Lợi, Tạp chí Văn hóa dân gian, số 1, 2005) \n. Ghe cửa là ghe có mũi nhọn, được dùng phổ biến ở vùng ven biển, cửa sông. (Từ điển từ ngữ Nam bộ, Huỳnh Công Tín, tr.543)", "count": 4}, {"stt": 35, "term": "Ghe cui", "group": "3", "source": ". Ghe cui loại ghe có hình dạng ngắn, mũi và lái tương đối bằng, không nhọn như các ghe khác. Dùng chở củi, lá lợp nhà.(Nguyễn Thanh Lợi, Tạp chí Văn hóa dân gian, số 1, 2005). . Ghe cui là dạng ghe ngắn, có phần mũi và lái bằng, rộng, trông vững chắc. (Từ điển từ ngữ Nam bộ, Huỳnh Công Tín, tr.543)", "count": 2}, {"stt": 36, "term": "Ghe diệu", "group": "2", "source": ". Ghe diệu là loại ghe hầu, có đủ tiện nghi, sơn son thếp vàng của quan viên đàng cựu (Vương Hồng Sển, Tự vị tiếng nói miền Nam, tr.361) . Ghe diệu là loại ghe được chạm trổ, sơn trang trí vàng đỏ, có trang bị nhiều tiện nghi, dùng để du lịch, vui chơi giải trí. (Từ điển từ ngữ Nam bộ, Huỳnh Công Tín, tr.543)", "count": 2}, {"stt": 37, "term": "Ghe điệu", "group": "2", "source": ". Ghe điệu loại ghe có mũi lái chạm trổ, kèo mui thường sơn son thếp vàng, bên trong lót ván trơn bóng, có chỗ nấu nướng, đủ tiện nghi để hút á phiện cho giới nhà giàu.(Nguyễn Thanh Lợi, Tạp chí Văn hóa dân gian, số 1, 2005).", "count": 1}, {"stt": 38, "term": "Ghe đục", "group": "2", "source": ". Ghe đục là loại ghe được đục lỗ ở hai bên hông để nước vào bên trong ghe cho cá không l bị chết khi di chuyển, còn phần mũi, lái được bịt kín để giữ cho ghe nổi, được dùng phổ biến ở miệt Hồng Ngự, Đông Tháp. (Từ điển từ ngữ Nam bộ, Huỳnh Công Tín, tr.543)", "count": 1}, {"stt": 39, "term": "Ghe đuôi tôm then trỗ", "group": "3", "source": ". Ghe đuôi tôm then trỗ là loại ghe có bàn đọ, bánh lái nằm trong (Vương Hồng Sển, Tự vị tiếng nói miền Nam, tr.361)", "count": 1}, {"stt": 40, "term": "Ghe giã", "group": "3", "source": ". Ghe giã là loại tàu thuyền sử dụng lưới hình túi lớn để đánh bắt hải sản tầng đáy hoặc gần đáy biển.(Từ điển tiếng Việt).", "count": 1}, {"stt": 41, "term": "Ghe giàn", "group": "2", "source": ". Ghe giàn loại ghe có ích thước khá lớn, hai bên hông trổ cánh cao để chở được nhiều hàng hóa.(Nguyễn Thanh Lợi, Tạp chí Văn hóa dân gian, 2005).", "count": 1}, {"stt": 42, "term": "Ghe Hải Nam", "group": "3", "source": ". Ghe Hải Nam là loại ghe có cột buồm cao và lưởn Cao, dáng theo kiểu tàu Hải Nam để nhảy sóng. (Từ điển từ ngữ Nam bộ, Huỳnh Công Tín, tr.544)", "count": 1}, {"stt": 43, "term": "Ghe hàng bo", "group": "2", "source": ". Ghe hàng bo là loại ghe nhỏ, chủ yếu được sử dụng để di chuyển trong nội địa.(Nguyễn Thanh Lợi, Tạp chí Văn hóa dân gian, số1, 2005).", "count": 1}, {"stt": 44, "term": "Ghe hàng bổ", "group": "3", "source": ". Ghe hàng bổ là ghe ban lồng, chở hàng hóa đi bán rong các chợ nhỏ (Vương Hồng Sển, Tự vị tiếng nói miền Nam, tr.361) . Ghe hàng bổ là ghe hạng trung có mui, được dùng để buôn bán hàng hoá lưu động cho bà con vùng nông thôn sâu. (Từ điển từ ngữ Nam bộ, Huỳnh Công Tín, tr.544)", "count": 2}, {"stt": 45, "term": "Ghe hát", "group": "2", "source": ". Ghe hát là loại ghe thuyền dùng để chở đoàn ca nhạc, thưởng là ca nhạc cổ, đi hát lưu động ở vùng nông thôn. (Từ điển từ ngữ Nam bộ, Huỳnh Công Tín, tr.544)", "count": 1}, {"stt": 46, "term": "Ghe hầu", "group": "3", "source": ". Ghe hầu loại ghe dành cho cai tổng, tri phủ, tri huyện. Ban đêm ghe thắp sáng không phải vì mục đích soi đường, mà để báo hiệu cho biết là ghe của quan. Một đoạn trích của Huỳnh Minh cho ta thấy hình ảnh của chiếc ghe hầu ngày xưa: “Khác với những ghe thường, ghe hầu được đóng vẻ đẹp đẽ, sang trọng hơn: sơn son thếp vàng, đầu rồng đuôi phụng, trước mũi hai chèo, mui ghe lộng lẫy, bên trong trang trí rất đẹp như một phòng khách trên nhà, nào chiếu bông nẹp điều, gối dựa vải màu sặc sỡ, đồ lệ bộ, ống điếu bình, văn án thấpv.v…Ban đầu chỉ có loại quan chức mới đi loại ghe này, về sau các nhà giàu có, dư dả cũng đua nhau sắm ghe hầu, như kiểu đổi Citroen con cóc để sắm Dodge hay Mercédes đi cho oai”.(Nguyễn Thanh Lợi, Tạp chí Văn hóa dân gian, số 1, 2005). . Ghe hầu là loại ghe sang trọng của quan viên thời xưa có lính theo hầu (Vương Hồng Sển, Tự vị tiếng nói miền Nam, tr.361)", "count": 2}, {"stt": 47, "term": "Ghe khoái", "group": "3", "source": ". Ghe khoái là ghe thật nhẹ, dùng đi việc quan cho mau, loại ghe sai (Vương Hồng Sển, Tự vị tiếng nói miền Nam, tr.361)", "count": 1}, {"stt": 48, "term": "Ghe lái ngoài", "group": "3", "source": ". Ghe lái ngoài là ghe không có bàn đọ, bánh lái nằm phơi ra ngoài (Vương Hồng Sển, Tự vị tiếng nói miền Nam, tr.361)", "count": 1}, {"stt": 49, "term": "Ghe lệ - Ghe ô", "group": "3", "source": ". Ghe lệ - Ghe ô là loại ghe dùng vận chuyển lính hay quân cụ. Những chiếc dành cho chỉ huy thường được chạm trổ toàn thân rất tinh xảo. Loại này thường được sơn đỏ nên cũng gọi là ghe son hay ghe vẹm. (Nguyễn Thanh Lợi, Tạp chí Văn hóa dân gian, số 1, 2005)", "count": 1}, {"stt": 50, "term": "Ghe lồng - Ghe bản lồng", "group": "2", "source": ". Ghe lồng hay ghe bản lồng là một loại loại ghe lớn, đầu mũi dài, có mui che mưa nắng, lòng ghe được ngăn thành từng khoang nhỏ để chứa các loại hàng hóa khác nhau. Loại ghe này dùng vận chuyển hàng hóa đi dọc bờ biển. (Nguyễn Thanh Lợi, Tạp chí Văn hóa dân gian, số1, 2005)", "count": 1}, {"stt": 51, "term": "Ghe lưới", "group": "1", "source": ". Ghe lưới là loại ghe giống như chiếc thuyền độc mộc, thân dài, thon, mũi nhọn. Đây là loại ghe của người Khơme. (Nguyễn Thanh Lợi, Tạp chí Văn hóa dân gian, 2005).", "count": 1}, {"stt": 52, "term": "Ghe mỏ vạch", "group": "3", "source": ". Ghe mỏ vạch là loại ghe mũi vớt cao lên như cái vạch của thợ may. (Nguyễn Thanh Lợi, Tạp chí văn hóa dân gian, số 1, 2005)", "count": 1}, {"stt": 53, "term": "Ghe nạn", "group": "3", "source": ". Ghe nạn là một loại ghe bằng nạn tre hoặc mè nó đàn bằng tre (Vương Hồng Sển, Tự vị tiếng nói miền Nam, tr.361)", "count": 1}, {"stt": 54, "term": "Ghe nang", "group": "3", "source": ". Ghe nang là một dạng thuyền thuần túy của người Việt, có đáy đan bằng nan tre, như cái thúng, trên là thân gỗ. (Thần Long kích thủy - lịch sử thuyền chiến Việt Nam, Đông Nguyễn, 2025, tr.48)", "count": 1}, {"stt": 55, "term": "Ghe Ngo (Tuk ngua)", "group": "3", "source": ". Ghe ngo (tuk rang) là một loại ghe nhiều màu sắc của dân tộc Khơme, thường dùng trong bơi đua trong các lễ hội. Ghe làm bằng cây sao, dài 10m trở lên. Ghe không mui, ở đầu mũi Chạm hình rồng, rắn, phụng, lân hoặc voi, sư tử, ó biển. Mỗi chiếc có thể chở từ 20 đến 40 tay chèo, xếp thành hàng đôi, một người cầm lái và một người cầm mũi. (Nguyễn Thanh Lợi, Tạp chí Văn hóa dân gian, số 1, 2005)", "count": 1}, {"stt": 56, "term": "Ghe nốc", "group": "3", "source": ". (Phương ngữ) Nốc là thuyền có mui.(Từ điển tiếng Việt). \n. Ghe nốc là loại thuyền bè thời Nam Bắc triều- Lê Trung Hưng với đầu và đuôi nhô cao, ván được ghép bằng cách \"khâu\" bằng sợi thực vật.(Thần Long kích thủy - lịch sử thuyền chiến Việt Nam, Đông Nguyễn, 2025).\n. Ghe nốc là một loại thuyền nhỏ, thường dùng trong các hoạt động đánh bắt cá, vận chuyển ngắn hoặc làm phương tiện đi lại trong khu vực nước lặng như sông, hồ, đầm phá.(Báo Vietnam.net).", "count": 3}, {"stt": 57, "term": "Ghe quyển", "group": "2", "source": ". Ghe quyển là loại ghe có mui che từ đầu đến cuối ghe, dùng để chở quân lính.(Nguyễn Thanh Lợi, Tạp chí Văn hóa dân gian, số 1, 2005)", "count": 1}, {"stt": 58, "term": "Ghe sai", "group": "3", "source": ". Ghe sai là ghe nhỏ nhẹ chèo, để đi việc quan cho mau lẹ (Vương Hồng Sển, Tự vị tiếng nói miền Nam, tr.361)", "count": 1}, {"stt": 59, "term": "Ghe son", "group": "2", "source": ". Ghe son là ghe sơn đỏ, thường dùng về việc binh (Vương Hồng Sển, Tự vị tiếng nói miền Nam, tr.361)", "count": 1}, {"stt": 60, "term": "Ghe tam bản", "group": "3", "source": ". Ghe tam bản là ghe ghe nhỏ, lớn hơn xuống, được đóng bằng ba tắm ván lón. \"Ở nông thôn mà có cái ghe tam bản với cái máy đuôi tôm la đi lại thoải mái rồi.\" (Từ điển từ ngữ Nam bộ, Huỳnh Công Tín, tr.545)", "count": 1}, {"stt": 61, "term": "Ghe tam sắc", "group": "3", "source": ". Ghe tam sắc là tàu thuyền đi tuần của Pháp, có treo cờ Pháp với ba màu, mà người dân quen gọi là \"tam sắc\". \"Nhưng không ghe nao dám qua một ghe tam sắc đâu, cá mười ăn một tôi cũng dám cá né.\" (Từ điển từ ngữ Nam bộ, Huỳnh Công Tín, tr.545)", "count": 1}, {"stt": 62, "term": "Ghe thương hồ", "group": "3", "source": ". Ghe thương hồ là ghe lớn chở hàng của giới buôn bán, kinh doanh. (Từ điển từ ngữ Nam bộ, Huỳnh Công Tín, tr.545)", "count": 1}, {"stt": 63, "term": "Ghe trẹt", "group": "3", "source": ". Trẹt là \"loại phương tiện di chuyển trong các kinh rạch cạn, ít có sóng gió, rộng bề ngang và bề dài không dài lắm, đáy cạn, bề ngang mũi và lái bằng nhau\" .", "count": 1}, {"stt": 64, "term": "Ghe vẹm", "group": "2", "source": ". Ghe vẹm là loại ghe của quan, loại ghe sơn ô thêm chạy đàng bèo đo (Vương Hồng Sển, Tự vị tiếng nói miền Nam, tr.361)", "count": 1}, {"stt": 65, "term": "Ghe vợi", "group": "3", "source": ". Ghe vợi là một loại ghe nhỏ, cột theo sau những chiếc ghe lớn để chuyển hàng hóa vào bờ. (Nguyên Thanh Lợi, Tạp chí Văn hóa dân gian, số 1, 2005)", "count": 1}, {"stt": 66, "term": "Ghe xệp", "group": "3", "source": ". Ghe xệp là loại ghe chuyên dùng để đánh cá (Từ điển từ ngữ Nam bộ, Huỳnh Công Tín, tr.545)", "count": 1}, {"stt": 67, "term": "Hải cốt thuyền", "group": "3", "source": ". Hải cốt thuyền là thuyền chiến dưới triều Lê Thánh Tông. Đây là thuyền chiến to lớn và rắn chắc với hàng chục tay chèo, hàng trăm binh sĩ, dàn trận trực chiến với thuyền giặc.(Bảo tàng lịch sử Quốc gia).\n. Hải cốt thuyền là thuyền chiến to lớn và rắn chắc với hàng chục tay chèo, hàng trăm binh sĩ, dàn trận trực chiến với thuyền giặc. (Bảo tàng Lịch sử Quốc gia)", "count": 2}, {"stt": 68, "term": "Hải Đạo thuyền", "group": "3", "source": ". Hải đạo là một dạng thuyền chiến chủ lực từ thời Tây Sơn đến tận triều Nguyễn ở thế kỉ XIX. (Thần Long kích thủy - Lịch sử thuyền chiến Việt Nam, Đông Nguyễn, 2025, tr.161).\n. Hải đạo thuyền là dạng thuyền có kết cấu rất giống Hồng thuyền: đều là dạng galley dài, hẹp, đáy nông, đầu đuôi ngẩng cao, có rất nhiều mái chèo và không có buồm, có một đại pháo đằng mũi,...Thuyền Hải đạo thời Nguyễn được quy định là dài sáu trượng một thước (~28,7m), rộng chín thước tám tấc (~4,6m), với 46 mái chèo. (Thần Long kích thủy - Lịch sử thuyền chiến Việt Nam, Đông Nguyễn, 2025, tr.162) . \n. Thuyền hải đạo - thuyền vận binh lương theo đàng biển (Đại Nam quốc âm tự vị, Huỳnh Tịnh Của, 1895) \n. Thuyền hải đạo là thuyền đi biển, dùng cho việc công (Ngành đóng thuyền và tàu thuyền ở Việt Nam thời Nguyễn, Trần Đức Anh Sơn, 2014, tr.62).\n. Hải Đạo thuyền là thuyền chiến nhà Nguyễn thời vua Minh Mạng.(Báo biên phòng: Những chiến thuyền bảo vệ biển, đảo thời Nguyễn).\n. Hải Đạo Thuyền là loại thuyền chuyên chiến đấu trên biển, được sản xuất khá nhiều do kích thước gọn, nhẹ khả năng cơ động, linh hoạt cao trong các trận hải chiến.(Báo biên phòng: Những chiến thuyền bảo vệ biển, đảo thời Nguyễn).", "count": 6}, {"stt": 69, "term": "Hải vận thuyền", "group": "3", "source": ". Hải vận (vận tải đường biển) là loại thuyền buồm lớn để chuyên chở hàng hóa, thuế khóa thời Nguyễn, đây là dạng thuyền không có bửng mũi và đuôi, đầu và đuôi đều nhọn giống như ghe bầu, với sống mũi rất rõ, mũi có chìa ra các thanh luân/ thanh ngã nằm ngang để gác neo đầu thuyền. (Thần Long kích thủy - lịch sử thuyền chiến Việt Nam, Đông Nguyễn, 2025, tr.190)", "count": 1}, {"stt": 70, "term": "Hỏa chiến thuyền", "group": "3", "source": ". Hỏa chiến thuyền là tên một loại thuyền chiến thời Lê Sơ ở thế kỉ XV. Tên gọi xuất phát từ việc thuyền mang các loại hỏa đồng , tức súng đủ cỡ, từ đại tướng quân, đại dạng, trung dạng đến tiểu dạng, chứ không phải thuyền dùng vào hỏa công. (Thần Long kích thủy - Lịch sử thuyền chiến Việt Nam, Đông Nguyễn, 2025, tr.154)", "count": 1}, {"stt": 71, "term": "Hồng thuyền", "group": "3", "source": ". Hồng thuyền là tên gọi của những galley chèo tay, có một súng đằng sau mũi (Thần Long kích thủy - Lịch sử thuyền chiến Việt Nam, Đông Nguyễn, 2025, tr.156) . Hồng thuyền nghĩa là \"thuyền đỏ\" xuất phát từ việc thân thuyền của quân thị hậu (quân túc trực, hậu vệ nhà chúa và bảo vệ kinh thành) được sơn phết màu đỏ tươi bóng loáng. Ngoài ra còn có những chi tiết trang trí được thếp vàng, bạc. (Thần Long kích thủy - Lịch sử thuyền chiến Việt Nam, Đông Nguyễn, 2025, tr.157)", "count": 2}, {"stt": 72, "term": "Khai Lãng thuyền", "group": "3", "source": ". Khai lãng thuyền thường ám chỉ thuyền lớn dùng để ra biển, khai hoang, mở cõi hoặc đi biển xa, không phải thuyền nhỏ đánh cá ven bờ. Người ta dùng cụm này mang tính hình tượng, gợi hình ảnh các thuyền chài, thuyền buôn, thuyền khai hoang thời xưa.(Âm vang sử Việt).", "count": 1}, {"stt": 73, "term": "Kiệu", "group": "1", "source": ". Kiệu là phương tiện thời trước dùng để khiêng người đi đường, gồm một ghế ngồi có mui che (Từ điển Hoàng Phê 2003, tr526) \n. Kiệu là đồ dùng để rước thần thánh , giống như cái kiệu được sơn son thếp vàng (Từ điển Hoàng Phê 2003, tr526) \n. Kiệu cái xe nhỏ để đi ở những đường hẹp,Dụng cụ di chuyển thời xưa, người ngồi lên trên, cho những người khác khiêng trên vai mà đi. (Từ điển Nguyễn Quốc Hùng) . Kiệu cái khung có màn che để ngồi cho người khiêng đi (Nguyễn Quang Hồng, Tự điển chữ Nôm dẫn giải)", "count": 4}, {"stt": 74, "term": "Kiệu Long Đình", "group": "3", "source": ". Kiệu Long Đình hay còn được gọi là kiệu hòm. Là Kiệu có mui dành cho vua đi hoặc để rước thần. (Từ điển tiếng Việt).", "count": 1}, {"stt": 75, "term": "Kiệu võng", "group": "1", "source": ". Kiệu võng là phương tiện đi lại của quan lại triều Nguyễn.(Đại Việt sử quán).\n. Kiệu võng có cấu trúc võng bằng lụa màu hồng. Đòn ngang của võng sơn son thếp vàng, khắc hình con giao long, đòn dọc của võng khắc hình con thú ứng với phẩm trật của vị quan ngồi trên võng. Mui che võng được quang dầu màu xanh để che mưa nắng. Quan lại trên hàng nhất phẩm thì có 4 người lính vác 4 chiếc lọng theo hầu, quan nhất phẩm chỉ có 3 lọng, quan nhị phẩm chỉ có 2 lọng và quan từ tam phẩm xuống đến cửu phẩm chỉ có 1 người vác lọng theo hầu.(Đại Việt sử quán).\n. Võng bằng lụa màu hồng. Mui che võng được quang dầu màu xanh để che mưa nắng. Quan lại trên hàng nhất phẩm thì có 4 người lính vác 4 chiếc lọng theo hầu, quan nhất phẩm chỉ có 3 lọng, quan nhị phẩm chỉ có 2 lọng và quan từ tam phẩm xuống đến cửu phẩm chỉ có 1 người vác lọng theo hầu.(bảo tàng lịch sử Quốc gia).", "count": 3}, {"stt": 76, "term": "Lâu thuyền", "group": "3", "source": ". Lâu thuyền là một loại thuyền chiến lớn, có vài tàng lầu gác bên trên thân thuyền như một tòa nhà nổi. Khung của lầu nối dài từ các kết cấu chịu lực của thân thuyền, nhưng cơ bản là độc lập với bộ xương của thuyền. (Thần Long kích thủy - lịch sử thuyền chiến Việt Nam, Đông Nguyễn, 2025, tr.140)\n. Lâu thuyền hay còn được gọi là thuyền cổ lâu.( trước họa xâm lăng của nhà Minh, nhà Hồ đã phải lo củng cố quốc phòng. Năm 1404, Hồ Hán Thương cho chế tạo thuyền cổ lâu - một loại thuyền chiến lớn đóng đinh sắt, có hai tầng boong với hàng chục tay chéo và hai người điều khiển một mái chèo, có tên gọi là Trung tàu tải lương, Cổ lâu thuyền tải lương, để chở lương nhưng cũng sẵn sàng chiến đấu.Theo mô tả, nếu thuyền bình thường có một đáy, thì thuyền loại này làm thêm một “đáy” nữa, tức một tầng sàn ở trên, chia bụng thuyền làm hai phần: phần dưới để lính chèo thuyền, phần trên giấu lính chiến đấu. (Bảo tàng Lịch sử Quốc gia).\n. Lâu Thuyền là thuyền khá to, có lầu lớn, đẹp trên thuyền. Lâu thuyền dùng cho Hoàng đế và Hoàng tộc đi trên sông Hương hay đi ven biển để thăm thú và duyệt binh. (Báo biên phòng: Những chiến thuyền bảo vệ biển, đảo thời Nguyễn).", "count": 3}, {"stt": 77, "term": "Lê thuyền /ghe lê", "group": "3", "source": ". Lê thuyền là loại thuyền chiến chèo tay, dài nhưng hẹp, nhẹ để sử dụng trên đường sông và cửa biển thời Nguyễn, lê thuyền rất đắc lực ở sông nước trung du và miền núi, nơi thế nước chảy xiết mà các loại thuyền khác khó đi ngược dòng.( (Thần Long kích thủy - Lịch sử thuyền chiến Việt Nam, Đông Nguyễn, 2025, tr.176) . Thuyền lê loại lớn từ mũi đến đuôi dài 5 trượng 2 thước 6 tấc (21m), sâu 3 thước 1 tấc (1,2m), 36 cọc chèo. (Khâm định Đại Nam hội điển sử lệ, quyển nhị bách thập bát - Thuyền chính\", Quốc sử quán triều Nguyễn) \n. Thuyền lê là thuyền có nhiều người chèo, thường đi trước để kéo thuyền ngự của vua (Ngành đóng thuyền và tàu thuyền ở Việt Nam thời Nguyễn, Trần Đức Anh Sơn, 2014, tr.61)\n. Lê thuyền là loại thuyền có trong giai đoạn nhà Nguyễn dưới thời vua Minh chuyên dành cho việc hộ giá Hoàng đế mỗi khi đi trên sông biển.(Báo biên phòng: Những chiến thuyền bảo vệ biển, đảo thời Nguyễn).", "count": 4}, {"stt": 78, "term": "Linh Xa", "group": "3", "source": ". Linh Xa (靈車) là loại xe chở quan tài trong đám tang.(Từ điển Hán Nôm).", "count": 1}, {"stt": 79, "term": "Lung thuyền", "group": "3", "source": ". Lung thuyền là một loại thuyền dùng phảng nối bằng 2 thân thuyền độc mộc. (Thần Long kích thủy - lịch sử thuyền chiến Việt Nam, Đông Nguyễn, 2025, tr.148) . Lung thuyền là \"Loại thuyền trong vùng từ Bình Thạch xuống Lục Lung đến Lạc Xương, gọi là 'song thuyền'. Thuyền đơn là thuyền nhỏ; 'song' là thuyền lớn...Dòng nước cực dữ dỗi, thuyền ngược xuôi đều va vào đá, thuyền đơn đi trong dòng nhỏ dễ bị cuốn trôi và lật úp, vì vậy nhất định phải dùng song thuyền - lực của nó có thể chống chọi lại với đá....Vốn các xứ cực hiểm ở Kiêu Nam (Lĩnh Nam) dùng song thuyền, gồm hai thuyền độc mộc tạo thành,\" (Quảng Đông tân ngữ - Chu ngữ, Khuất Đại Quân)", "count": 2}, {"stt": 80, "term": "Mẫn Thỏa khí cơ đại đồng thuyền", "group": "3", "source": ". Mẫn Thỏa khí cơ đại đồng thuyền là chiếc tàu bọc đồng đầu tiên nhờ Pháp mua tại Hương Cảng đã về đến cửa biển Thuận An thả neo.(Tạp chí khoa học Tàu thủy công nghiệp Việt Nam)\n. Tàu dài 11 trượng 2 thước 3 tấc, rộng 1 trượng 6 thước 9 tấc, trọng tải trên dưới 300.000 cân; trị giá 97.200 lạng bạc, bằng 135.000 đồng bạc, (mỗi đồng bạc nặng 7 đồng cân 2 phân bạc). Ngoài ra mua thêm một số phụ tùng của tàu trị giá 20.000 đồng bạc tương đương 14.400 lạng bạc.(Tạp chí khoa học Tàu thủy công nghiệp Việt NNam", "count": 2}, {"stt": 81, "term": "Mảng", "group": "3", "source": ". Mảng là loại bè nhỏ, dùng làm phương tiện để vận chuyển trên mặt nước.(Từ điển tiếng Việt).", "count": 1}, {"stt": 82, "term": "Ngư thuyền", "group": "3", "source": ". Ngư thuyền là thuyền chiến đầu tiên, có dài ước hơn 8 trượng (~26m), rộng ước hơn 8, 9 thước (~2,6m – 2,9m).Ngư thuyền có hình dáng gống như trái bí lớn thuôn dẹt, hai bên mũi và lái có 3, 4 mái chèo, hoặc gắn bánh xe nước. Thuyền đóng gỗ dầy rất chắc chắn, hai bên đặt pháo, khi bắn pháo thuyền không rung lắc. (Uông Trọng Dương, An Nam chiến thuyền thuyết)\n. Ngư thuyền là thuyền chiến cỡ lớn của thủy quân triều Nguyễn. Tên gọi ngư thuyền, có thể do dáng thuyền gần giống 1 loại thuyền đánh cá ở Trung Hoa hoặc cũng có thể do dựa vào tính năng tác chiến của kiểu thuyền chiến cỡ nhỏ có tên ngư thuyền thời Minh.(Lâm Tắc Từ, An Nam chiến thuyền tthuyết", "count": 2}, {"stt": 83, "term": "Ngựa", "group": "1", "source": ". Ngựa thời nhà Nguyễn, ngựa ngoài việc dùng trong quân đội, còn được dùng để lưu chuyển công văn, giấy tờ, thư từ quan trọng của triều đình. Hầu hết, các trạm dịch đều được cấp ngựa trạm. Ban đầu, mỗi trạm được cấp hai con ngựa, sau này việc chuyển đệ công văn tăng thêm thì mỗi trạm được cấp từ ba đến sáu con ngựa khỏe kèm theo tiền nuôi ngựa.(Xứ Bắc Kỳ năm 1900, Robert Dubois).\n. Ngựa khi thực dân Pháp xâm lược Đông Dương, ngựa được sử dụng nhiều trong quân đội. Năm 1883, quân Pháp nhập khẩu 60 con ngựa Manila để cấp cho binh lính. Một năm sau, tiếp tục nhập thêm ngựa từ Miến Điện và Java. Sau đó nữa là ngựa Nhật Bản và Mông Cổ.(Xứ Bắc Kỳ năm 1900, Robert Dubois).", "count": 2}, {"stt": 84, "term": "Ô thuyền", "group": "3", "source": ". Ô thuyền hay còn được gọi là thuyền đen là thuyền chiến nhỏ thời các chúa Nguyễn cát cứ Đàng Trong, triều Tây Sơn đến tận triều đại Nguyễn ở thế kỉ XIX, có vai trò là trợ chiến cho các chiến hạm lớn như hải đạo, và để giao liên, có kích thước nhỏ hơn nhiều so với hồng thuyền và hải đạo thuyền. (Thần Long kích thủy - Lịch sử thuyền chiến Việt Nam, Đông Nguyễn, 2025, tr.173) \n. Ô thuyền là dạng thuyền có kích thước từ mũi đến đuôi dài 4 trượng 8 thước (~ 19m), rộng 8 thước 4 tấc (~3,4m), sâu 3 thước 2 tấc (~1,3m), 30 cọc chèo. (Khâm định Đại Nam hội điển sử lệ, quyển nhị bách thập bát - Thuyền chính\", Quốc sử quán triều Nguyễn) .Ô thuyền là thuyền sơn đơn dùng để chở lính (Ngành đóng thuyền và tàu thuyền ở Việt Nam thời Nguyễn, Trần Đức Anh Sơn, 2014, tr.61)\n. Ô thuyền là thuyền chiến nhà Nguyễn thời vua Minh Mạng.(Báo biên phòng: Những chiến thuyền bảo vệ biển, đảo thời Nguyễn).\n. Ô Thuyền là loại thuyền chuyên đi biển, sơn màu đen cả thân và cánh buồm, thuyền có 12 tay chèo. Với khả năng di chuyển nhanh, thuyền được trang bị cho hải quân tuần tiễu vùng ven biển. (Báo biên phòng: Những chiến thuyền bảo vệ biển, đảo thời Nguyễn)", "count": 5}, {"stt": 85, "term": "Phà", "group": "2", "source": ". Phà là phương tiện vận chuyển lớn, có hình chữ nhật, lòng phẳng, dùng để chở xe cộ và người qua sông.(Từ điển tiếng Việt).", "count": 1}, {"stt": 86, "term": "Phảng/ Phương", "group": "3", "source": ". Phảng hay Phương là một dạng thuyền hai thân, có cấu tạo và kích thước tương tự nhau, được liên kết bằng các thanh giằng gỗ vững chãi ở đầu và đuôi, tạo thành một hệ nổi vững chãi, có thể chịu được những dòng nước xiết hoặc sóng gió biển khơi. (Thần Long kích thủy - lịch sử thuyền chiến Việt Nam, Đông Nguyễn, 2025, tr.148)", "count": 1}, {"stt": 87, "term": "Sà lan", "group": "3", "source": ". Sà lan phương tiện vận chuyển hàng hoá bằng đường thuỷ, có đáy bằng, thành thấp.(Từ điển tiếng Việt).\n. Sà lan là một thuyền có đáy bằng, một phương tiện dùng để chở các hàng hóa nặng di chuyển chủ yếu ở các con kênh hoặc các con sông.(Từ nguyên tiếng Việt).", "count": 2}, {"stt": 88, "term": "Tắc ráng", "group": "3", "source": ". Tắc ráng là phương tiện di chuyển có hình dạng thường dài hơn vỏ lãi, mũi nhọn, chạy rất nhanh (chiếc Speedo do Kiên Giang Composite chế tạo có thể chạy đến 60km/giờ). Chiếc ghe đặc biệt xuất hiện từ năm cuối 1959 ở địa danh mà cả xóm, ấp, chợ và con rạch đều mang tên Tắc Ráng (nay là khóm Vĩnh Viễn, phường Vĩnh Hiệp, thị xã Rạch Giá, tỉnh Kiên Giang).(Nguyễn Thanh Lợi, Tạp chí Văn hóa dân gian, số 1, 2005).", "count": 1}, {"stt": 89, "term": "Tẩu kha thuyền", "group": "3", "source": ". Tẩu kha thuyền là loại thuyền do nữ tướng chỉ huy, không dùng buồm, thân thon dài, trên có 3 cột cờ đại và 2 hàng cờ nheo dọc thân thuyền, phu chèo và thủy binh đều tinh nhuệ, lợi hại và đi lại như bay, đột kích bất ngờ, rút lui nhanh chóng.(Bảo tàng lịch sử Quốc gia)", "count": 1}, {"stt": 90, "term": "Thiện Hải thuyền", "group": "3", "source": ". Thiện Hải thuyền là thuyền chiến nhà Lê.(Âm vang sử Việt)\n. Thiện Hải thuyền là loại thuyền dài, dài 65 thước (khoảng 26m), rộng 10 thước (khoảng 4m), 46 cột chèo – thấp mạn nhưng cơ động, phù hợp với tính chất hoạt động trong sông và ven biển, trọng tải ước chừng khoảng 100 – 150 tấn. Vỏ thuyền gồm các ván được ghép bằng đinh sắt. Mũi thuyền vát hơn đuôi thuyền và đều uốn cao hẳn lên, thường được gia cố thêm bằng những phiến đồng hoặc đinh đồng. Phần lòng thuyền dường như để trống, phía trên lát ván kín, tạo ra một mặt bằng hoạt động rất cần thiết khi chiến đấu. Hai bên mạn thuyền có những mái chèo dày đặc (trung bình khoảng 50 – 60 mái chèo). Bánh lái trông rất độc đáo, như một dấu hỏi đặt nằm ngửa, nối với hệ thống cần lái ở đằng đuôi thuyền. Dọc hai bên thuyền là những cột nâng mái, tương ứng với hệ thống mái chèo. Lầu chỉ huy đặt ở mũi thuyền, trang trí đẹp. Điểm độc đáo nhất của cấu tạo thuyền này là một mái che lớn, che kín hầu như toàn bộ thuyền, đảm bảo sức khỏe và an toàn cho người và vũ khí trên thuyền. Mỗi thuyền có từ 1 – 5 khẩu pháo. (Âm vang sử Việt).", "count": 2}, {"stt": 91, "term": "Thuận Tiệp khí cơ đại đồng thuyền", "group": "3", "source": ". Thuận Tiệp khí cơ đại đồng thuyền là chiếc tàu bọc đồng thứ 2 mua ở Hương Cảng.(Tạp chí khoa học Tàu thủy công nghiệp Việt Nam)\n. Tàu sản xuất năm 1864, dài 9 trượng 3 thước 6 tấc, trọng tải khoảng 400.000 cân, thân bọc đồng, có 2 tầng, 1 ống khói, 2 cột buồm. Khí cụ đem theo tàu gồm: 6 khẩu đại pháo, 15 khẩu điểu sang, 5 khẩu mã sang.(Tạp chí khoa học Tàu thủy công nghiệp Việt Nam)", "count": 2}, {"stt": 92, "term": "Thuyền", "group": "1", "source": ". Thuyền là phương tiện giao thông nhỏ trên mặt nước, hoạt động bằng sức người , sức gió (Từ điển Hoàng Phê: tr.1125)", "count": 1}, {"stt": 93, "term": "Thuyền bọc đồng", "group": "3", "source": ". Thuyền bọc đồng là loại thuyền chiến, kích thước lớn, dùng trong thủy quân triều Nguyễn. Đây là loại thuyền do vua Minh Mạng học tập và tiếp thu kĩ thuật đóng thuyền chiến của phương Tây, rồi sai binh lính thuộc vệ Thần Uy và vệ Chấn Uy và lính thợ thuộc cơ Ngũ Thủy và cơ Kiên Chu theo mẫu tàu của Pháp đóng thử (Ngành đóng thuyền và tàu thuyền ở Việt Nam thời Nguyễn, Trần Đức Anh Sơn, 2014, tr.66)", "count": 1}, {"stt": 94, "term": "Thuyền bồng", "group": "2", "source": ". Thuyền bồng là loại thuyền có mui, mình bầu, mũi bằng và đuôi cao (Từ điển Hoàng Phê: 2022, tr. 1125)", "count": 1}, {"stt": 95, "term": "Thuyền buồm", "group": "1", "source": ". Thuyền buồm là loại thuyền có gắn buồm, chạy bằng sức gió (Từ điển Hoàng Phê: 2022, tr113)", "count": 1}, {"stt": 96, "term": "Thuyền câu", "group": "1", "source": ". Thuyền câu là thuyền dùng để đi câu cá, nhưng trên thực tế đây “chiếc thuyền độc mộc, ở giữa có tàng che và diềm che bằng lụa vàng, có 4 đến 6 tay chèo”. Đây là thuyền hộ tống trong \nđoàn thuyền ngự của vua, nhiệm vụ của nó thật ra là để truyền lệnh của vua cho các quan chức đi theo hầu nhà vua, đang ở trong các thuyền khác.( Nguyễn Đình Hòe, “Thuyền ngự và thuyền quan ở Huế xưa”, Những người bạn cố đô Huế [BAVH 1916] (Đặng Như Tùng dịch, Bửu Ý hiệu đính), Nxb Thuận Hóa, Huế, 1997, tr. 302).", "count": 1}, {"stt": 97, "term": "Thuyền chiến", "group": "2", "source": ". Thuyền chiến bản địa của Việt Nam từ thời Lê Trung Hưng ( 1533 - 1789) cho đến thời Nguyễn (1802 - 1945) là dạng \"galley\" dài, hẹp, đáy bằng, mớn nước nông, đầu. đuôi ngẩng cao, có rất nhiều mái chèo và không có buồm. có một đại pháo đằng mũi.(Kì Công Diệu Nghệ, Đông Nguyễn, 2025, tr.52)\n. Thuyền có kích thước dài khoảng 25 - 30 cm, rộng 4 - 6 m, với khoảng 50 mái chèo. Chúng rất phù hợp khi di chuyển trên sông và ven biển. Do động lực chính là mái chèo, chúng không phụ thuộc vào hướng gió mà có thể di chuyển tùy ý.(Kì Công Diệu Nghệ, Đông Nguyễn, 2025, tr.52)", "count": 2}, {"stt": 98, "term": "Thuyền chiến bọc đồng (Khỏa đồng thuyền 裹銅船)", "group": "3", "source": ". Thuyền bọc đồng hay còn được gọi là Khỏa đồng thuyền.(Kì Công Diệu Nghệ, Đông Nguyễn, 2025, tr.66).\n. Thuyền chiến bọc đồng là thuyền bọc đồng dưới đáy (để chống hàu, hà bám vào và đục thủng vỏ gỗ) theo kỹ thuật của phương Tây.(Thần Long kích thủy - lịch sử thuyền chiến Việt Nam, Đông Nguyễn). \n. Thuyền chiến bọc đồng đã xuất hiện từ thế kỉ XIX, thời nhà Nguyễn (1802 - 1945).(Kì Công Diệu Nghệ, Đông Nguyễn, 2025, tr.66).\n. Thuyền chiến bọc đồng có tư liệu chỉ ra rằng đây là loại thuyền có từ thời Đông. Trong \"Giao Châu Ký\" của Lưu Hân Kì đời Tấn chép \"Người Việt đúc đồng làm thuyền, khi nước triều trên sông rút đôi khi có thể thấy\". Trong thập niên 70 của thế kỷ trước, nhiều nhà nghiên cứu quốc tế (Joseph Needham, Vương Linh, Lỗ Quế Trân, Tịch Long Phi) và trong nước (Nguyễn Hữu Hợp, Trần Quang Vinh, Nguyễn Tử Lan) nhận định đây có thể là dấu tích về thuyền bọc đồng ở đáy. Nhận định này rất có cơ sở vì vùng biển Đông ấm áp là môi trường lý tưởng cho hàu, hà sinh trưởng, và bên cạnh bọc đồng, người Việt đã phải phát minh ra 1 loạt các kỹ thuật khác để ứng phó với đám ký sinh phiền phức này, từ thui vỏ gỗ cho đến đan đáy bằng nan tre (hàu, hà không ăn được tre). Có lẽ từ thời Trần, Hồ trở đi, do tình trạng khan hiếm đồng, thuyền bọc đồng đã biến mất. (Bảo tàng lịch sử Quốc gia).\n. Thuyền chiến bọc đồng đến thời nhà Nguyễn được coi là một thành tựu rực rỡ khi đã tái du nhập đáy bọc đồng từ phương Tây. (Bảo tàng lịch sử Quốc gia).", "count": 5}, {"stt": 99, "term": "Thuyền chiến lửa (hỏa chiến thuyền - 火戰船) (43-Thần Long kích thủy)", "group": "3", "source": ". Thuyền chiến lửa (thường gọi là hỏa chiến thuyền hay fire ship trong tiếng Anh) là một loại tàu chiến được thiết kế đặc biệt với mục đích chính là gây hỏa hoạn để tiêu diệt hoặc làm hỗn loạn đội hình tàu đối phương.(Theo Wikipedia tiếng Việt).", "count": 1}, {"stt": 100, "term": "Thuyền chu Kiều", "group": "3", "source": ". Thuyền chu Kiều là một loại thuyền trên sông, cũng có khả năng đi men biển , động lực cung cấp bằng chèo tay, có khả năng tiến ngược dòng mà không phụ thuộc gió hay thủy triều. Đó cũng là kiểu thuyền chiến mà các vương quốc Champa và Khmer sử dụng phổ biến cùng thời đại (Thần Long kích thủy - lịch sử thuyền chiến Việt Nam, Đông Nguyễn, 2025, tr.134)", "count": 1}, {"stt": 101, "term": "Thuyền công", "group": "3", "source": ". Thuyền công là phương tiện chuyên chở binh lính, vận chuyển lương thực, công văn và hàng hóa phục vụ triều đình thời phong kiến. Không cầu kỳ về hình thức, thuyền công chú trọng vào công năng, độ bền và sức chứa. Loại thuyền này không có hoa văn trang trí, chỉ tập trung vào mục đích phục vụ.(Đại Việt sử quán).", "count": 1}, {"stt": 102, "term": "Thuyền công cấp phát", "group": "3", "source": ". Thuyền công cấp phát là những loại thuyền do triều đình cho đóng trong các xưởng thuyền của nhà nước để cấp phát cho quân đội, các cơ quan của triều đình ở kinh sư và chính quyền ở các địa phương để phục vụ cho việc công như: hộ tống thuyền vua, đi công cán, tuần tiễu, trao đổi công văn liên lạc giữa trung ương với địa phương và giữa các địa phương với nhau, vận tải hàng hóa cho triều đình. (Ngành đóng thuyền và tàu thuyền ở Việt Nam thời Nguyễn, Trần Đức Anh Sơn, 2014, tr.73)", "count": 1}, {"stt": 103, "term": "Thuyền dẫn đĩnh", "group": "3", "source": ". Thuyền sai là loại thuyền do nhà Nguyễn đóng từ triều vua Gia Long.(Khâm định Đại Nam hội điển sự lệ, quyển 217).\n. Thuyền dẫn đĩnh là là thuyền dẫn đầu đoàn thuyền ngự của vua (Ngành đóng thuyền và tàu thuyền ở Việt Nam thời Nguyễn, Trần Đức Anh Sơn, 2014, tr.61)", "count": 2}, {"stt": 104, "term": "Thuyền đáy đan nan", "group": "3", "source": ". Thuyền đáy đan nan là một họ thuyền gồm nhiều kích cỡ khác nhau, từ nhỏ như thuyền thúng cho đến lớn như thuyền giã. Trung Hoa và các nước Đông Nam Á khác đều không có.(Kì Công Diệu Nghê, Đông Nguyễn, 2025, tr.48)", "count": 1}, {"stt": 105, "term": "Thuyền đinh", "group": "3", "source": ". Thuyền đinh là thuyền lớn bằng gỗ có mũi nhọn, thân và đuôi hình lăng trụ (Từ điển Hoàng Phê: 2022, tr113)", "count": 1}, {"stt": 106, "term": "Thuyền đinh sắt", "group": "3", "source": ". Thuyền đinh sắt là loại thuyền chiến nhà Trần bên cạnh thuyền Châu Kiều.(Âm vang sử Việt) \n.Thuyền đinh sắt là loại thuyền được đóng ghép bằng những đinh sắt hoặc ốp những đinh sắt có đầu đinh lớn – một kỹ thuật đóng thuyền mới xuất hiện vào thời kỳ này để tăng độ lớn của thuyền và tăng độ bền vững trong những trận đấu thuyền Loại thuyền này khá lợi hại, mỗi mái chèo có hai người đẩy, lòng thuyền chia làm hai tầng, tầng dưới dành cho lính chèo thuyền, tầng trên lát sàn để lính chiến đấu dễ bề hoạt động Có lẽ thuyền đinh sắt là tên gọi chung của các thuyền: thuyền lầu, thuyền cổ lâu, thuyền lưỡng phúc….(Âm vang sử Việt).", "count": 2}, {"stt": 107, "term": "Thuyền độc mộc", "group": "3", "source": ".Thuyền đọc mộc loại thuyền chế tác từ một thân gỗ duy nhất (Thần Long kích thủy - lịch sử thuyền chiến Việt Nam, Đông Nguyễn, 2025, tr.14)", "count": 1}, {"stt": 108, "term": "Thuyền đối thủy", "group": "3", "source": ". Thuyền đối thủy là một trong 3 loại thuyền chiến thường được nhắc tới của nhà Trần.(Âm vang sử Việt).\n. Thuyền đối thủy – dùng sức thuyền chọi thuyền, có khả năng đi biển tương đối tốt. Loại thuyền cỡ trung bình là loại có khoảng 30 tay chèo và khoảng 20 – 30 lính chiến đấu.(Âm vang sử Việt).", "count": 2}, {"stt": 109, "term": "Thuyền đồng nhiều dây", "group": "3", "source": ". Thuyền đồng nhiều dây là thuyền chiến có vỏ thuyền bọc đồng và nhiều cánh buồm (Ngành đóng thuyền và tàu thuyền ở Việt Nam thời Nguyễn, Trần Đức Anh Sơn, 2014, tr.61)", "count": 1}, {"stt": 110, "term": "Thuyền Đông Sơn", "group": "3", "source": ". Thuyền Đông Sơn là loại thuyền độc mộc hoặc thuyền ghép ván được khắc họa chi tiết trên các hiện vật đồng (trống đồng, thạp đồng) hoặc là các ngôi mộ quan tài hình thuyền thuộc văn hóa Đông Sơn (7 TCN - 6 CN). (Thư viện Quốc gia Việt Nam).", "count": 1}, {"stt": 111, "term": "Thuyền đuôi én", "group": "3", "source": ". Thuyền đuôi én là một \"đặc sản\" của sông Đà, cũng là một bản sắc văn hóa của người Thái Trắng vùng ven sông Đà thuộc các tỉnh Lai Châu, Điện Biên, Sơn La. Đó là dạng thuyền ban đầu có đáy là một con thuyền độc mộc, tức thuyền làm từ một thân cây khoét rỗng được ghép ván ở hai mạn thuyền, đuôi thuyền uốn cong có hai nhánh giống hình đuôi én. Từ đó, người Thái Trắng gọi nó là “hứa hang én”, tức “thuyền đuôi én”.(báo Đại đoàn kết).\n. Thuyền đuôi én có nhiều dạng, loại nhỏ nhất chỉ có 1 chèo, loại lớn nhất có 10 chèo, khoang thuyền thường rộng khoảng 0,8 - 1,2 m. Nhìn chung, đó là dạng thuyền nhỏ dài để dễ thích ứng với sóng nước và ghềnh thác sông Đà, dòng sông lớn và hiểm trở nhất vùng Tây Bắc.(báo Đại đoàn kết).", "count": 2}, {"stt": 112, "term": "Thuyền giã", "group": "3", "source": ".Thuyền giã là thuyền buồm để vận tải bằng đường biển (Thần Long kích thủy - Lịch sử tàu chiến Việt Nam, Đông Nguyễn, 2025, tr.156) . \"Tốt và nhanh nhẹn để giong buồm, nhưng quá yếu nhược cho chiến trận, chỉ khâu ván bằng sợi mây, nhưng chúng đủ phục vụ cho chuyên chở lương thảo và binh sĩ.\" (Những góc nhìn về Việt Nam thế kỉ XVII: Christoforo Borri ở Đàng Trong và Samuel Baron ở Đàng Ngoài\", thế kỉ XVII, Samuel Baron, Christoforo Borri)", "count": 2}, {"stt": 113, "term": "Thuyền Hiệu Ba", "group": "3", "source": ". Thuyền Hiệu Ba là thuyền của thủy quân (Ngành đóng thuyền và tàu thuyền ở Việt Nam thời Nguyễn, Trần Đức Anh Sơn, 2014, tr.62)", "count": 1}, {"stt": 114, "term": "Thuyền hơi nước - Khi cơ thuyền (汽機船)", "group": "2", "source": ". Khí cơ thuyền hay còn được gọi là thuyền máy hơi của phương Tây, tức là thuyền hơi nước, được triều Nguyễn mua vào năm 1838, vua Minh Mạng đã sai Vũ Khố dựa trên máy của thuyền này để chế tạo một bộ máy mới. Thuyền hơi nước trong thời điểm này được ứng dụng trong thương mại hàng hải ở Phương Tây và chưa từng được thử lửa trong chiến trận (Thần Long kích thủy - Lịch sử thuyền chiến Việt Nam, Nguyễn Đông, 2025, tr.195)\n. Thuyền hơi nước là một chiếc thuyền dùng lực đẩy chủ yếu bằng năng lượng hơi nước, điển hình là lái cánh quạt hoặc mái chèo.(Wekipedia tiếng Việt).\n. Thuyền hơi nước đầu tiên của Việt Nam được chế tạo dưới thời vua Minh Mạng (1791 - 1841), được cải tạo theo Khi Cơ thuyền của phương Tây.(Kì Công Diệu Nghệ, Đông Nguyễn, 2025, tr.54)\n. Ngày mồng 2 tháng 4 nhuận năm Minh Mệnh thứ 19 (1838), Bộ Công dâng tấu về việc đóng tàu máy hơi nước như sau: “Hôm qua vâng sắc chỉ, bộ thần chiếu theo quy cách thuyền chạy bằng hơi nước làm trước một chiếc để thay, chiều ngang theo kích thước cũ, chiều dài tăng thêm 4 - 5 thước, mũi thuyền, đuôi thuyền thu nhỏ bớt... Thuyền này làm xong, tiếp tục làm một chiếc khác ngay, chiều rộng, chiều dài đều tăng thêm 2 thước. Chuẩn cho bọn Hoàng Văn Lịch, Vũ Huy Trinh theo cách thức chế tạo.”(Trung tâm lưu trữ Quốc gia, Minh Mệnh tập 68, tờ 23)", "count": 4}, {"stt": 115, "term": "Thuyền khoái", "group": "2", "source": ". Thuyền sai là loại thuyền do nhà Nguyễn đóng từ triều vua Gia Long.(Khâm định Đại Nam hội điển sự lệ, quyển 217).\n. Thuyền khoái là thuyền chiến nhỏ dùng trong thủy quân (Ngành đóng thuyền và tàu thuyền ở Việt Nam thời Nguyễn, Trần Đức Anh Sơn, 2014, tr.61)", "count": 2}, {"stt": 116, "term": "Thuyền lầu", "group": "3", "source": ". Thuyền lầu là thuyền chiến thời Lý.(Âm vang sử Việt).\n. Thuyền lầu gồm những tầng lầu cao (lâu) nên có lợi thế về chiều cao (có chiếc đến 27m), phát huy được hiệu quả quan sát, chỉ huy và vũ khí tầm xa; chứa được nhiều lính và ưu thế về vũ khí tầm xa như cung, nỏ. (Âm vang sử Việt).\n. Thuyền lầu là một loại thuyền chiến lớn đóng đinh sắt, có hai sàn (boong) chia tàu thành hai tầng: tầng trên giấu lính chiến đấu, tầng dưới chứa lính chèo thuyền với hàng chục tay chèo và hai người điều khiển một mái chèo. Ở đây, thuyền lầu gắn chặt với chiến thuật dùng cung nỏ trong đánh thủy, có thể chở được trên hai trăm người và lương thảo, khí giới, thực hiện tốt những chuyến vượt biển xa hàng ngàn kilômét.(Âm vang sử Việt).\n. Thuyền lầu xuất hiện khá sớm ở Trung Quốc (năm 219TCN). Ở Việt Nam, năm 1205 (thời Lí) Đàm Dĩ Mông đã chế tạo thuyền lầu, sau đó các vua Trần cũng đã dùng thuyền lầu làm tướng phủ (Sở chỉ huy) trong các cuộc kháng chiến chống quân xâm lược Mông – Nguyên.(Âm vang sử Việt)", "count": 4}, {"stt": 117, "term": "Thuyền lớn", "group": "1", "source": ". Thuyền lớn hay còn gọi là đại chiến thuyền, trong môt số tài liệu của nhà Nguyên họi là hạm chiến là một trong 3 loại thuyền chiến thường được nhắc đến của nhà Trần.(Âm vang sử Việt).\n. Thuyền lớn là thuyền dành cho các tướng chỉ huy (Âm vang sử Việt).", "count": 2}, {"stt": 118, "term": "Thuyền Long Lân - 龍麟 (53- Thần Long kích thủy)", "group": "3", "source": ".Thuyền Long Lân (龍麟) là một loại thuyền truyền thống Việt Nam, thường được trang trí với hình ảnh rồng (Long - 龍) ở mũi thuyền và kỳ lân (Lân - 麟) ở đuôi hoặc các vị trí trang trí khác, tượng trưng cho quyền uy và sự linh thiêng.(Báo Thanh niên).", "count": 1}, {"stt": 119, "term": "Thuyền lưỡng phúc", "group": "3", "source": ". Thuyền lưỡng phúc còn được gọi là thuyền hai bụng/đáy là thuyền được nhà Hồ cho bắt đầu đóng năm 1403 - 1404.(Âm vang sử Việt)\n. Thuyền lưỡng phúc là một loại thuyền chiến hạng trung, đóng bằng gỗ, liên kết bằng đinh sắt, có buồm và nhiều mái chèo, có hai đáy (bụng): đáy trên chở lương thực, vũ khí hoặc lính chiến đấu; đáy dưới dành riêng cho phu chèo thuyền, chủ yếu dùng để vận tải.(Âm vang sử Việt).", "count": 2}, {"stt": 120, "term": "Thuyền mành", "group": "2", "source": ". Thuyền mành loại thuyền buồm lớn chạy ở vùng ven biển (có buồm trông tựa cái mành) (Từ điển Hoàng Phê: 2022, tr.1125)", "count": 1}, {"stt": 121, "term": "Thuyền mẫu tử", "group": "3", "source": ". Thuyền mẫu tử là dạng thuyền gồm có thuyền nhỏ (tử thuyền) giấu bên trong thuyền to hơn (mẫu thuyền) để sử dụng trong đánh hỏa công. (Thần Long kích thủy - lịch sử thuyền chiến Việt Nam, Đông Nguyễn, 2025, tr.140)\n. Thuyền mẫu tử có cấu tạo hai thuyền lồng vào nhau và có thể tách rời nhau, 4 mái chèo, 1 buồm, chuyên dùng đánh hỏa công. Thuyền ngoài (thuyền mẹ) dài khoảng 12m, trong khung chứa cỏ, củi, thuốc súng; đầu mũi cắm các đinh lớn, nhọn bằng sắt, hông thuyền cũng đầy đinh sắt. Thuyền trong (thuyền con) là chiến thuyền nhỏ. Khi chiến đấu, thủy thủ trong thuyền nhỏ chèo thật nhanh, lao thật mạnh vào thuyền đối phương, khiến cho những đinh sắt nhọn ở mũi, khung thuyền mẹ cắm vào mạn thuyền đối phương, sau đó người ta châm lửa đốt thuyền mẹ, rồi tách thuyền con ra khỏi thuyền mẹ, rút lui hoặc tiếp tục chiến đấu như một chiến thuyền thông thường.(Âm vang sử Việt).\n. Thuyền mẫu tử là loại thuyền chuyên dùng để đánh hoả công, gồm 2 thân lồng vào nhau, 4 mái chèo, 1 buồm. Khung thuyền giả to (thuyền mẹ) bọc ngoài, ở phía trước một chiếc thuyền thật nhỏ hơn (thuyền con). Trên khung thuyền to, người ta chất củi lửa và thuốc cháy, mũi thuyền có những đinh nhọn, hông thuyền cũng đầy đinh sắt. Khi đánh địch, người ngồi núp trong thuyền nhỏ chèo thật nhanh, lao thật mạnh vào thuyền đối phương, khiến cho những đinh sắt nhọn ở mũi khung thuyền giả cắm vào mạn thuyền đối phương. (Bảo tàng Lịch sử Quốc gia).", "count": 3}, {"stt": 122, "term": "Thuyền mông đồng", "group": "3", "source": ". Thuyền Mông đồng là dạng thuyền có 32 mái chèo để đi nhanh nhẹn, và có các cỗ máy nỏ để chiến đấu từ xa, lại có thể quay đầu thuyền bằng cách đảo đầu đuôi (Thần Long kích thủy - lịch sử thuyền chiến Việt Nam, Đông Nguyễn, 2025, tr.016).\n. Thuyền mông đồng xuất hiện nhiều trong lịch sử từ thời Đường thuộc đến thời nhà Hồ, cụ thể: \"Quan đô hộ nhà Đường là Trương Chu đã sáng chế ra loại thuyền chiến tên mông đồng ở đầu thế kỉ IX, có hai mươi lăm tay chèo, và có đầu và mũi tương tự nhau, có thể đảo đầu đuôi để chèo.\" (Thần Long kích thủy - lịch sử thuyền chiến Việt Nam, Đông Nguyễn, 2025, tr.132)", "count": 2}, {"stt": 123, "term": "Thuyền nan", "group": "2", "source": ". Thuyền nan là loại thuyền nhỏ đan bằng nan tr, có ken sơn (Từ điển Hoàng Phê: 2022, tr.1125) \n. Thuyền nan (trong tiếng Anh là “bamboo boat”) là danh từ chỉ một loại thuyền được chế tạo chủ yếu từ bàng nan tre, có khả năng nổi trên mặt nước nhờ vào thiết kế nhẹ và độ bền cao. Thuyền nan thường được sử dụng trong các hoạt động đánh bắt cá, vận chuyển hàng hóa nhẹ và các hoạt động du lịch sinh thái.(Từ điển Tiếng Việt)", "count": 2}, {"stt": 124, "term": "Thuyền ngự - Ngự Bạc", "group": "3", "source": ". Thuyền ngự là một dạng thuyền chiến của nhà vua thời Lí, Trần có mui, là biểu tượng uy quyền, vừa là hành cung tiện nghi (Thần Long kích thủy - lịch sử thuyền chiến Việt Nam, Đông Nguyễn, 2025, tr.151) \n. Thuyền ngự là dạng thuyền thường phải bỏ cột buồm và tay chèo để đổi lại sự rộng rãi, thoải mái. Muốn di chuyển thuyền phải có các thuyền khác buộc dây và kéo. Thuyền vua thường có chín dây kéo. Thuyền của bậc hậu, quý phi, thân vương...giảm dần số dây kéo. (Thần Long kích thủy - Lịch sử thuyền chiến Việt Nam, Đông Nguyễn, 2025, tr.153)", "count": 2}, {"stt": 125, "term": "Thuyền ngự bọc đồng", "group": "3", "source": ". Thuyền ngự bọc đồng là du thuyền của nhà vua nhưng vỏ thuyền bọc đồng bên ngoài (Ngành đóng thuyền và tàu thuyền ở Việt Nam thời Nguyễn, Trần Đức Anh Sơn, 2014, tr.61)", "count": 1}, {"stt": 126, "term": "Thuyền nhẹ (Kinh chu - 經舟)", "group": "3", "source": ". Thuyền nhẹ là một trong 3 loại thuyền chiến thường được nhắc của nhà Trần. (Âm vang sử Việt).\n. Thuyền khinh là thuyền chiến nhẹ dùng trong thủy quân (Ngành đóng thuyền và tàu thuyền ở Việt Nam thời Nguyễn, Trần Đức Anh Sơn, 2014, tr.61)", "count": 1}, {"stt": 127, "term": "Thuyền Phụng Phi (鳳飛)\n(54 - Thần Long kích thủy)", "group": "3", "source": ". Thuyền Phụng Phi (鳳飛) là một loại thuyền đua truyền thống nổi tiếng trong các lễ hội đua thuyền ở vùng Quảng Ngãi, Việt Nam, đặc biệt liên quan đến các đội như Thuyền Phụng An Vĩnh hoặc An Hải trong lễ khao lính Hoàng Sa và đua thuyền tứ linh (Phụng, Long, Lân, Quy).", "count": 1}, {"stt": 128, "term": "Thuyền quan", "group": "2", "source": ". Thuyền quan được sử dụng bởi quan lại cấp trung và thấp trong các công việc hành chính thường ngày, như đi tuần, tiếp dân, khảo sát vùng đất. Thuyền thường có kích thước nhỏ hoặc vừa, có mái che đơn giản bằng tre hoặc gỗ, do 1 – 2 người chèo điều khiển.(Đại Việt sử quán).", "count": 1}, {"stt": 129, "term": "Thuyền rồng", "group": "1", "source": ". Thuyền rồng là thuyền của vua, có chạm hình rồng (Từ điển Hoàng Phê, 2022 tr.1125). .Thuyền rồng là thuyền của vua, vẽ hoặc chạm khắc hình rồng (Ngành đóng thuyền và tàu thuyền ở Việt Nam thời Nguyễn, Trần Đức Anh Sơn, 2014, tr.61).\n. Thuyền rồng là phương tiện dành riêng cho vua và các quan lại thời phong kiến, những bậc quan cấp cao trong những dịp lễ lớn, tuần du hay tiếp sứ thần. Đặc điểm nổi bật của loại thuyền này là hình đầu rồng được chạm khắc tinh xảo ở mũi thuyền – biểu tượng quyền lực tối thượng. Thân thuyền thường được sơn son thếp vàng, trang trí lộng lẫy với nhiều mái chèo, lọng, phướn và mái che công phu.(Đại Việt sử quán).", "count": 3}, {"stt": 130, "term": "Thuyền sai", "group": "2", "source": ". Thuyền sai là loại thuyền do nhà Nguyễn đóng từ triều vua Gia Long.(Khâm định Đại Nam hội điển sự lệ, quyển 217).\n. Thuyền sai là thuyền do nhà nước sai phái đi việc công (Ngành đóng thuyền và tàu thuyền ở Việt Nam thời Nguyễn, Trần Đức Anh Sơn, 2014, tr.61)", "count": 2}, {"stt": 131, "term": "Thuyền Tế Thống", "group": "3", "source": ". Thuyền Tế Thông là thuyền của vua Tự Đức, là loại lâu thuyền hai tầng, tầng trên dành cho vua, có bốn phòng; tầng dưới dành cho đoàn tùy tùng, có năm phòng.(Báo dân Việt:Thuyền ngự của vương triều Nguyễn có gì đặc biệt).", "count": 1}, {"stt": 132, "term": "Thuyền Thiện Hải", "group": "3", "source": ". Thuyền Thiện Hải là loại thuyền chiến thời nhà Lê.(Âm vang sử Việt).\n. Thuyền Thiện Hải là thuyền dài có kích thước dài 65 thước (khoảng 26m), rộng 10 thước (khoảng 4m), 46 cột chèo – thấp mạn nhưng cơ động, phù hợp với tính chất hoạt động trong sông và ven biển, trọng tải ước chừng khoảng 100 – 150 tấn. Vỏ thuyền gồm các ván được ghép bằng đinh sắt. Mũi thuyền vát hơn đuôi thuyền và đều uốn cao hẳn lên, thường được gia cố thêm bằng những phiến đồng hoặc đinh đồng. Phần lòng thuyền dường như để trống, phía trên lát ván kín, tạo ra một mặt bằng hoạt động rất cần thiết khi chiến đấu. Hai bên mạn thuyền có những mái chèo dày đặc (trung bình khoảng 50 – 60 mái chèo). Bánh lái trông rất độc đáo, như một dấu hỏi đặt nằm ngửa, nối với hệ thống cần lái ở đằng đuôi thuyền. Dọc hai bên thuyền là những cột nâng mái, tương ứng với hệ thống mái chèo. Lầu chỉ huy đặt ở mũi thuyền, trang trí đẹp. Điểm độc đáo nhất của cấu tạo thuyền này là một mái che lớn, che kín hầu như toàn bộ thuyền, đảm bảo sức khỏe và an toàn cho người và vũ khí trên thuyền. Mỗi thuyền có từ 1 – 5 khẩu pháo.(Âm vang sử Việt).", "count": 2}, {"stt": 133, "term": "Thuyền thoi", "group": "3", "source": ". Thuyền thoi là loại thuyền nhỏ và dài, hai đầu nhọn, có hình giống cái thoi (Từ điển Hoàng Phê: 2022, tr.1126)", "count": 1}, {"stt": 134, "term": "Thuyền thúng", "group": "1", "source": ".Thuyền thúng là thuyền nan nhỏ, hình giống như cái thúng to, chở được một người (Từ điển Hoàng Phê: 2022, tr.1126)\n. Thuyền thúng hau còn được gọi là thuyền chai.(Trung tâm bảo tồn di sản văn hóa thế giới Hội An).\n. Thuyền thúng do tướng Trần Ứng Long nghĩ ra cách cho lính đốn tre để đan thứ thuyền nan, rồi lấy nhựa bôi vào thân thuyền. Nhờ đó ông đưa được lính qua sông và đuổi bắt được Đỗ Cảnh Thạc. Truyền thuyết không cho biết loại thuyền nan này có hình dáng như thế nào, chỉ biết thuyền được tạo thành bởi tre đan và trét nhựa cây. Thật ra loại thuyền hình tròn, bọc bằng da, vải xuất hiện từ những năm trước Công nguyên ở một số quốc gia vùng Lưỡng Hà. Nhưng loại thuyền thúng, thúng chai hình tròn đan bằng tre lại là một sản phẩm mang đậm dấu ấn của người Việt.(Theo Vũ Hữu San dẫn lại Nguyễn Huỳnh Anh trong Việt Nam danh nhân tự điển thì)\n. Thuyền thúng cũng được tìm thấy trên một số rìu đồng ở vùng sông Mã (Thanh Hóa). Những chiếc thuyền thúng lớn hình bầu dục, vành cạp tre ở miệng, có thanh tre buộc ngang. Thuyền thúng chỉ chở từ 1-2 người, dùng ở vùng sông nước, cửa biển.(Nguyễn Thanh Lợi, Văn nghệ Huế).", "count": 4}, {"stt": 135, "term": "Thuyền Trường Đà - 長舵", "group": "3", "source": ". Trường Đà là một kiểu thuyền chiến có bánh lái tròn và bánh lái dài, vừa có thể đi đường sông, vừa có thể đi đường biển. (Thần Long kích thủy - lịch sử thuyền chiến Việt Nam, Đông Nguyễn, 2025, tr.71)\n. Thuyền Trường Đà là thuyền chiến được sử dụng trong quân đội triều Nguyễn.(Tạp chí Sông Hương - Số 387 (T.05-21)).\n. Thuyền Trường Đà được đóng bằng gỗ kiền kiền, đặc điểm trên gác sàn chiến đấu, hai bên dựng phên tre che thủy binh ở dưới để cho chuyên sức mà chèo, còn trên thì bày bộ binh để xung trận mà đánh. (Tạp chí Sông Hương - Số 387 (T.05-21))\n. Trường đà hay còn được gọi là bánh lái dài, là một biến thể của ghe bầu, dùng để xung trận. Đây là sáng tạo của tướng Đỗ Thanh Nhơn dưới quyền chúa Nguyễn Ánh. Chiếc thuyền có bánh lái dài, vốn chỉ tiện đi đường biển, ông đã sáng chế thêm cả bánh lái tròn để thay vào khi cần tiến vào sông, bởi thế thuyền còn có tên là Song Đà \"hai loại bánh lái\" (Thần Long kích thủy - Lịch sử thuyền chiến Việt Nam, Đông Nguyễn, 2025, tr.179)", "count": 4}, {"stt": 136, "term": "Thuyền tuần dương", "group": "3", "source": ". Thuyền tuần dương là thuyền tần tiểu trên biển do vua Minh Mạng sáng chế (Ngành đóng thuyền và tàu thuyền ở Việt Nam thời Nguyễn, Trần Đức Anh Sơn, 2014, tr.62)", "count": 1}, {"stt": 137, "term": "Thuyền tuần tiễu nhỏ (tiểu tiêu thuyền - 小哨船)", "group": "3", "source": ". Thuyền tuần tiễu nhỏ là loại thuyền gỗ nhỏ gọn dùng cho nhiệm vụ tuần tra, canh gác ven sông hoặc ven biển trong lịch sử hàng hải Á Đông, đặc biệt ở Việt Nam thời phong kiến và cận đại. Thuyền dài khoảng 5-10m, rộng 1-2m, mũi nhọn cao để vượt sóng, dùng buồm vải hoặc chèo tay, có thể mang 4-8 người với vũ khí nhẹ như súng trường, giáo mác.Thiết kế đơn giản, nhẹ, dễ ẩn nấp, tốc độ nhanh nhờ mái chèo linh hoạt, phù hợp sông ngòi chằng chịt hoặc vùng ven biển nông.Dùng bởi lực lượng thủy quân hoặc dân binh để tuần tra chống cướp biển, buôn lậu, bảo vệ làng chài, thường hoạt động theo đội hình nhỏ.", "count": 1}, {"stt": 138, "term": "Thuyền Tường Quang", "group": "3", "source": ". Thuyền Tường Quang có nhiều tư liệu cho rằng đây là loại thuyền có từ thời nhà: Năm 1124 (thời Lý)... nhà vua cho đóng thuyền Tường Quang, kiểu thuyền hai lòng\".(Đại Việt sử ký toàn thư).", "count": 1}, {"stt": 139, "term": "Thuyền ván sam", "group": "3", "source": ". Thuyền sai là loại thuyền do nhà Nguyễn đóng từ triều vua Gia Long.(Khâm định Đại Nam hội điển sự lệ, quyển 217).\n. Thuyền ván sam là thuyền nhỏ đóng bằng gỗ sam, cấp cho các địa phương dùng trong công việc. (Ngành đóng thuyền và tàu thuyền ở Việt Nam thời Nguyễn, Trần Đức Anh Sơn, 2014, tr.61).\n. Thuyền ván sam nhỏ kiểu Tây dương là thuyền đóng bằng gỗ sam, theo kiểu phương Tây, mũi thuyền cao nên đi nhanh hơn. (Ngành đóng thuyền và tàu thuyền ở Việt Nam thời Nguyễn, Trần Đức Anh Sơn, 2014, tr.61).", "count": 3}, {"stt": 140, "term": "Thuyền ván sam nhỏ kiểu Tây dương", "group": "3", "source": ". Thuyền ván sam nhỏ kiểu Tây dương là thuyền đóng bằng gỗ sam, theo kiểu phương Tây, mũi thuyền cao nên đi nhanh hơn (Ngành đóng thuyền và tàu thuyền ở Việt Nam thời Nguyễn, Trần Đức Anh Sơn, 2014, tr.61)", "count": 1}, {"stt": 141, "term": "Trực thăng", "group": "1", "source": ". (Khẩu ngữ) Trực thăng là máy bay trực thăng (nói tắt).(Từ điển tiếng Việt).", "count": 1}, {"stt": 142, "term": "Trung tàu tải lương - 中艚載粮", "group": "3", "source": ".Trung tàu tải lương là một loại lâu thuyền, có mái chèo lớn hai người chèo, và được đóng bằng đinh sắt để phòng giặc Minh (Thần Long kích thủy - lịch sử thuyền chiến Việt Nam, Đông Nguyễn, 2025, tr.41)", "count": 1}, {"stt": 143, "term": "Từ Giá", "group": "3", "source": ". Từ giá là kiệu của Hoàng Thái hậu, gồm 1 Phượng dư và 1 Phượng liễn. (Đại Việt sử quán.)\n. Lỗ bộ tháp tùng Từ giá có 2 lá cờ rồng, 2 lá cờ phượng, 2 lá cờ thanh đạo, 8 lá cờ phướn, 2 quạt thêu hình rồng phượng màu vàng, 4 quạt thêu hình rồng phượng màu đỏ, 4 quạt thêu hình loan phượng màu xanh và thêm 20 thứ binh khí hộ vệ.(Đại Việt sử quán).", "count": 2}, {"stt": 144, "term": "Viễn Thông", "group": "3", "source": ". Viễn Thông là tàu bọc đồng thứ 4 được mua lại từ Đức vào tháng 10/1872.(Tạp chí khoa học Tàu thủy công nghiệp Việt Nam)", "count": 1}, {"stt": 145, "term": "Vỏ lãi", "group": "3", "source": ". Vỏ lãi là \"loại phương tiện di chuyển trên kênh, rạch, có chiều dài khoảng 5, 6 mét, chiều ngang tương đối nhỏ, chỉ rộng vừa khoảng 2 người ngồi\". (Từ điển từ ngữ Nam Bộ, Huỳnh Công Tín)", "count": 1}, {"stt": 146, "term": "Voi", "group": "1", "source": ". Voi được sử dụng làm phương tiện di chuyển trong chiến trận của Việt Nam được nhắc đến ở những thời kỳ khá sớm. Hai Bà Trưng, Bà Triệu đều gắn liền với hình tượng cưỡi voi đánh giặc. Đời Lê, đời Lý đời Trần nước ta cũng có ghi nhận sử dụng voi trong chiến trận nhưng không quy mô như các quốc gia khác, trận chiến lớn nhất là nhà Trần dùng tượng binh ngăn quân Nguyên ở lần đụng độ đầu tiên trên Bình Lệ Nguyên nhưng không được thành công cho lắm. Sau này đến lượt nhà Hồ đem tượng binh ra xài thì còn thê thảm hơn nữa. Chỉ đến sau này khi Đại Việt tiến xuống miền Nam và hình thành Đàng Trong thì tượng binh mới có những tiến bộ nhất định.(Đại Việt sử quán).", "count": 1}, {"stt": 147, "term": "Xe", "group": "1", "source": ". Phương tiện đi lại hoặc vận tải trên bộ, có bánh lăn (Từ điển Hoàng Phê 2003, tr.1145) \n. Phương tiện chuyển chở có bánh lăn ( Nguyễn Quang Hồng, Tự điển chữ Nôm dẫn giải) \n. Phương tiện giao thông, Ngựa ngựa xe xe la ỷ tốt, dập dìu là ấy chiêm bao. (Thuật hứng 52.7) (Nguyễn Trãi Quốc Âm từ điển, Trần Trọng Dương)", "count": 3}, {"stt": 148, "term": "Xe be", "group": "2", "source": ".Xe be là loại xe chuyên dụng có cần cẩu trên xe, để chổ gỗ còn nguyên cây. \"Ba cái xe be chỏ gỗ chạy riết đường hư hết chó có gì đâu.\" (Từ điển từ ngữ Nam bộ, Huỳnh Công Tín, tr.1345)", "count": 1}, {"stt": 149, "term": "Xe ben", "group": "1", "source": ". Xe ben là loại xe tải nặng. \"Xe ben, xe be vô ra đây thưởng xuyên, đường nào chịu cho thấu.\" (Từ điển từ ngữ Nam bộ, Huỳnh Công Tín, tr.1345)", "count": 1}, {"stt": 150, "term": "Xe bò", "group": "1", "source": ". Xe bò là loại xe thô sơ có hai bánh, thường do trâu bò kéo, dùng để chuyên chở vật hàng, kéo xe bò (Từ điển Hoàng Phê 2003, tr. 1145)", "count": 1}, {"stt": 151, "term": "Xe bù ệt", "group": "3", "source": ". Xe bù ệt là xe cút kít, xe thô sơ, có một cái thủng để dựng, được đặt trên một cái khung có hai tay cầm dùng để đẩy và một bánh xe lăn ở phía trước. (Từ điển từ ngữ Nam bộ, Huỳnh Công Tín, tr.1345).", "count": 1}, {"stt": 152, "term": "Xe buýt", "group": "1", "source": ". (Khẩu ngữ) Xe buýt là ô tô buýt (Từ điển tiếng Việt).\n. Xe buýt là phương tiện giao thông công cộng lớn, chạy theo tuyến cố định, dùng để chở nhiều hành khách cùng lúc. Từ này là cách nói tắt thông dụng của \"xe buýt\".(Từ điển tiếng Việt).", "count": 2}, {"stt": 153, "term": "Xe căm nhông", "group": "3", "source": ". Xe căm nhông là loại xe cam nhông, loại xe tải dùng trong quân đội, có thủng ở phía sau buông lái, để chở lính ngồi thành hai hàng dọc theo thân xe, giữa thùng xe dùng để đô. \"Bữa nay có chuyện gì ma xe cam nhông chỏ lính chạy nườm nượp vậy cả?\". (Từ điển từ ngữ Nam bộ, Huỳnh Công Tín, tr.1345)", "count": 1}, {"stt": 154, "term": "Xe cút kít (xe rùa)", "group": "2", "source": ". Xe cút kít là loại phương tiện để vận chuyển lương thực trong chiến dịch Điện Biên Phủ, xe hình chữ A, chiều dài của xe là 206cm, càng xe được làm bằng gỗ có ghi số 2810 - 229, có hai chân chống làm bằng tre. Bánh xe có đường kính 75cm được ghép bởi ba mảnh gỗ khác nhau, trong đó có một mảnh được sơn son thếp vàng có những đường hoa văn đỏ, vàng xen lẫn nhau rất đẹp. (Báo Quân đội nhân dân).", "count": 1}, {"stt": 155, "term": "Xe dân biểu", "group": "3", "source": ". Xe dân biểu là loại xe đò, loại xe dùng để chở khách, cách nói vui, hàm ý xe do dân thưởng sai bảo, điều khiển (biểu). \" Người ta giau có thì người ta đi xe con, mình không có tiền nhiễu thi đi xe dân biểu thôi.\" (Từ điển từ ngữ Nam bộ, Huỳnh Công Tín, tr.1345)", "count": 1}, {"stt": 156, "term": "Xe đạp", "group": "1", "source": ". Xe đạp là xe người đi, có hai hoặc ba bánh, tay lái nối với bánh trước, dùng sức người đạp cho quay bánh (hoặc hai bánh) sau. (Từ điển Hoàng Phê 2003, tr.1145)", "count": 1}, {"stt": 157, "term": "Xe đạp thồ", "group": "2", "source": ". Xe đạp thồ là phương tiện di chuyển thô sơ trong chiến dịch Điện Biên Phủ được dùng để vận chuyển lương thực và đạn dược. Một chiếc xe đạp thồ có sức chở trung bình từ 50 đến 100kg, tương đương sức mang vác của 5 người, tốc độ nhanh hơn và có thể vận chuyển được các vật tư cồng kềnh, chất lỏng (xăng, dầu), đi được trên nhiều loại đường, địa hình khác nhau mà ô tô không đi được.(Bảo tàng lịch sử Quốc gia).", "count": 1}, {"stt": 158, "term": "Xe đẩy", "group": "2", "source": ". Xe đẩy là loại xe có một bánh, có nguồn gốc từ Trung Hoa, một bánh gỗ đặc lấy nguyên từ khoanh cây được lồng trục và gắn với một giá đỡ dài có hai đòn tay để đẩy, trên giá gỗ người ta làm một khung nổi để chất bao hàng, thậm chí là gắn một chiếc ghế vào đó để dẩy một người già, dưới tay đẩy có gán hai chống đỡ, khi dừng xe, xe có thể đứng vững trên mặt đất. Đôi khi còn gắn một cánh buồm để đẩy cho nhanh.(Văn minh vật chất người Việt, Phan Cẩm Thượng, 2011)", "count": 1}, {"stt": 159, "term": "Xe đò", "group": "1", "source": ". Xe đò là loại xe ô tô chở khách đường dài (Từ điển Hoàng Phê 2022, tr.1453) . Xe đò là loại xe ô tô ca, xe lớn dùng để chuyên chổ hành khách đi lại ở các tuyến đường liên tỉnh, liên huyện. (Từ điển từ ngữ Nam bộ, Huỳnh Công Tín, tr.1345)", "count": 2}, {"stt": 160, "term": "Xe giép", "group": "2", "source": ". Xe giép là loại xe gíp, ô tô loại nhỏ, trông vuông văn, có hai cầu truyền động cả bốn bánh, nên có thể di chuyển được ở nhiều địa hình, thưởng dùng phổ biến trong quân đội Mỹ. \"Ba cái xe giép quân đội, bây giỏ, ít thấy, có lẽ vì nó đã cũ quá rồi.\" (Từ điển từ ngữ Nam bộ, Huỳnh Công Tín, tr.1345)", "count": 1}, {"stt": 161, "term": "Xe kéo", "group": "1", "source": ". Xe kéo hay còn gọi là xe tay (Từ điển tiếng Việt)\n. Xe kéo còn có người ta cho rằng loại xe này đã ra đời vào đầu kỷ nguyên Minh Trị tại Nhật Bản, vào khoảng năm 1869. Hồi đó, những gia đình khá giả có thể tậu một chiếc xe do người làm kéo đi những lúc cần di chuyển, thay vì phải đi bộ.(Nam Kỳ lục tỉnh, Nguyễn Ngọc Chính, 2017).\n. Năm 1883, chiếc xe kéo, hay còn gọi là xe tay tại miền Bắc, xuất hiện lần đầu tiên tại Hà Nội do Thống sứ người Pháp, Jean Thomas Raoul Bonnal, cho đem từ bên Nhật qua. Xe kéo Hà Nội xuất hiện một năm sau chiếc xe hơi đầu tiên tại Âu Châu và một năm trước xe tramway, một loại xe do ngựa kéo. Gần 15 năm sau, Sài Gòn mới biết tới loại xe này.(Nam Kỳ lục tỉnh, Nguyễn Ngọc Chính, 2017).", "count": 3}, {"stt": 162, "term": "Xe lam", "group": "2", "source": ". Xe lam là xe gắn máy có ba bánh, hình giống ô tô nhưng nhỏ hơn, dùng để chở người, chở hàng đường gần.(Từ điển tiếng Việt).\n. Xe lam được xuất pát từ dòng xe 3 bánh Lambretta FD, xe FLI và Lambro 200, 250. Những chiếc xe này đèu xuất phát từ Italy (Ý). Xe được chia làm 2 ca; phía trước là cabin do bác tài làm chủ lái cả chiếc xe, phần dưới ghế ngồi của bác tài là thùng chứa máy xe. Cứ mỗi lần xe chết máy là bác lại nhấc yên xe lên chùi bughi, tra dầu. Phần sau là phần ghế để cho khách. Xe cơ bản được thiết kế cho khoảng 8 – 10 người. Những dòng xe này được nhập vào Việt Nam khoảng những năm 1960.(Nam Lục tỉnh; Nguyễn Ngọc Chính; 2017).", "count": 2}, {"stt": 163, "term": "Xe lô", "group": "2", "source": ". Xe lô là loại xe xe chở khách loại nhỏ, phổ biến trước 75, có dạng của xe bốn chỗ. \"Vân chơi nước cờ trội, cậu Ba mướn gắn chục xe lô ở Cần Thơ, bắt tài xế đổi bằng xe nhà với hai chiếc xe Huê kỳ của gia đình họ Trân ở Bạc Liêu là một chục”. (Từ điển từ ngữ Nam bộ, Huỳnh Công Tín, tr.1346)", "count": 1}, {"stt": 164, "term": "Xe loan", "group": "3", "source": ". Xe dùng cho vua đi thời xưa ( Từ điển Hoàng Phê 2003, tr1146).\n. (Từ cũ) Xe loan là xe có khắc hình chim loan, dùng cho vua chúa đi thời xưa.(Từ điển tiếng Việt).", "count": 2}, {"stt": 165, "term": "Xe lội nước", "group": "3", "source": ". Xe lội nước là xe vừa chạy được trên cạn, vừa chạy được dưới nước (Từ điển Hoàng Phê 2003, tr.1146).\n. Xe lội nước là xe quân sự vừa chạy được trên cạn vừa chạy được dưới nước.(Từ điển tiếng Việt).", "count": 2}, {"stt": 166, "term": "Xe lửa - tàu lửa", "group": "1", "source": ". Xe lửa (trong tiếng Anh là “train”) là danh từ chỉ một phương tiện vận tải gồm nhiều toa chạy trên đường ray, được kéo bởi một đầu máy. Các đầu máy có thể hoạt động bằng nhiều nguồn năng lượng khác nhau, bao gồm sức hơi nước, dầu ma-dút hoặc điện năng. Xe lửa thường được sử dụng để vận chuyển hành khách và hàng hóa qua các khoảng cách dài, đặc biệt là trên những tuyến đường sắt chính.(Từ điển Tiếng Việt)", "count": 1}, {"stt": 167, "term": "Xe máy (xe mô tô)", "group": "1", "source": ". Xe máy là xe hai bánh, chạy bằng động cơ.(Từ điển tiếng Việt).\n. Xe máy (còn gọi là mô tô hay xe hai bánh, xe gắn máy, phiên âm từ tiếng Pháp: Motocyclette) là loại xe có hai bánh theo chiều trước-sau và chuyển động nhờ động cơ gắn trên nó.(Wekipedia tiếng Việt).", "count": 2}, {"stt": 168, "term": "Xe mu rùa (xe bọ - xe con cóc)", "group": "2", "source": ". Xe \"mu rùa\", \"xe bọ\" hay \"xe con cóc\" là những tên gọi dân gian ở Việt Nam chỉ chiếc xe Volkswagen Beetle (VW Beetle), mẫu xe hơi cổ nổi tiếng của hãng Volkswagen (Đức), sản xuất từ 1938 đến 2003.Xe có thiết kế tròn trịa độc đáo với phần đuôi cong giống mai rùa, nóc thấp và kính chắn gió nhỏ, động cơ 4 xi-lanh làm mát bằng không khí đặt phía sau (dung tích 1.1-1.6 lít), công suất 25-50 mã lực.(Theo báo giadinh.suckhoedoisong)", "count": 1}, {"stt": 169, "term": "Xe tải (ô tô tải)", "group": "1", "source": ". Xe tải hay còn gọi là ô tô tải là ô tô lớn để chở hàng.(Từ điển tiếng Việt).\n. Xe tải là loại xe cơ giới được thiết kế để vận chuyển hàng hóa, chở tải đặc biệt hoặc thực hiện các công việc hữu ích khác. Xe tải có sự đa dạng về kích thước, công suất và kết cấu, thường được xây dựng với cấu trúc khung thân-vỏ và cabin độc lập với phần tải.(Wekipedia tiếng Việt.)", "count": 2}, {"stt": 170, "term": "Xe thổ mộ (xe ngựa)", "group": "2", "source": ". Xe thổ mộ là loại xe dùng phổ biến trong hoàng cung hoặc quân (Văn minh vật chất người Việt, Phan Cẩm Thượng, 2011)\n. Xe thổ mộ loại xe hai bánh gỗ được làm chắc chắn bởi những loại gỗ tốt có ngâm tẩm lâu nên bền và nhẹ. Trên sàn xe có dụng một cái mái chắn, còn bên trong có ghế ngồi dài, đôi khi người ta để xe trần và cắm một chiếc lọng che cho vua, hoặc mái chỉ chỉ có bốn cột trống mà không quây buồng kín.(Văn minh vật chất người Việt, Phan Cẩm Thượng, 2011) . Xe thổ mộ là loại xe dùng ngựa kéo, để chuyên chở hành khách ở các tuyến đường nông thôn Nam Bộ ngày trước những năm 1945. \"Ngay trước những năm 45, ông dượng tôi làm nghề đánh xe thô mộ trên tuyến đưởng quê nay.\" (Từ điển từ ngữ Nam bộ, Huỳnh Công Tín, tr. 1347)", "count": 3}, {"stt": 171, "term": "Xe tờ", "group": "3", "source": ". Xe tờ là xe chuyển thư báo, giấy tờ. \"Xe tờ ngay trước những năm 20, ngươi ta cũng dung xe ngựa thôi, chó có xe hơi chỉ đâu.\" (Từ điển từ ngữ Nam bộ, Huỳnh Công Tín, tr.1347)", "count": 1}, {"stt": 172, "term": "Xe trắc - xông (Traction)", "group": "3", "source": ". Xe trắc-xông (hay tắc-xông, traction) là tên gọi quen thuộc ở Việt Nam của chiếc xe hơi Citroën Traction Avant do hãng Citroën (Pháp) sản xuất.Đây là mẫu xe cổ được sản xuất từ năm 1934 đến 1957, nổi tiếng với thiết kế dẫn động cầu trước tiên phong, khung gầm liền khối và hệ thống treo độc lập bằng thanh xoắn.Xe có đường nét mềm mại, thường được ví như \"Nữ hoàng thiên nga\" nhờ thân xe cong uyển chuyển, màu đen bóng và cách chạy êm ái, nhẹ nhàng. (Báo Vietnamnet)", "count": 1}, {"stt": 173, "term": "Xe trâu", "group": "1", "source": ". Xe trâu là phương tiện vừa di chuyển, vừa lấy sức kéo canh tác vừa như căn nhà di động của các dân tộc như Mạ, Chơ ro, S' tiêng, Cơ ho mà người Pháp xưa gọi chung là Mois. Những chiếc xe trâu đúng nghĩa được kéo bởi những chú trâu to lớn khỏe mạnh. Bánh xe là những vòng gỗ có đường kính khá lớn nhưng chắc chắn đủ đưa cả gia đình băng rừng, vượt suối trong đời sống du mục xưa. (Đại Việt sử quán).", "count": 1}, {"stt": 174, "term": "Xe vua", "group": "3", "source": ". Xe vua là xe lôi đạp, từ dùng để gọi xe lôi đạp ở Bạc Liêu. (Từ điển từ ngữ Nam bộ, Huỳnh Công Tín, tr.1347)", "count": 1}, {"stt": 175, "term": "Xích lô", "group": "1", "source": ". Xích lô là xe ba bánh do người đạp, dùng để chuyên chở người hoặc hàng hoá.(Từ điển tiếng Việt). \n. Xích lô, trong tiếng Pháp là “cyclo pousse” là một sáng chế của ông Coupeaud. Xích lô là kiểu xe đạp 3 bánh, được làm bằng chất liệu nhẹ, có dáng vẻ thanh lịch và tiện nghi. Xích lô khác với một loại xe đạp 3 bánh khác cũng xuất hiện thời kỳ đó là hành khách ngồi phía trước và người đạp xe ở phía sau. Loại xe mới này có vận tốc nhanh hơn xe kéo tay.(Bảo tàng lịch sử Quốc gia).\n. Xích lô là loại xe 3 bánh vận hành bằng sức người (sử dụng bàn đạp), do Pierre Coupeaud (người Pháp) chế tạo thử nghiệm tại Paris vào đầu những năm 1930 với tên gọi ban đầu là tri-porteur, sau đó Coupeaud đem loại xe này vào Campuchia năm 1935, gọi chúng là cyclo-pousse. Năm 1939, Coupeaud tổ chức một chuyến đi từ Phnom Penh tới Sài Gòn bằng cyclo-pousse do 2 người thay phiên nhau lái. Về sau người Việt gọi loại xe này đơn giản là \"xích lô\" (cyclo). (Theo Báo Thanh niên)", "count": 3}, {"stt": 176, "term": "Xích lô máy", "group": "2", "source": ". Xích lô máy là loại phương tiện giao thông 3 bánh có gắn động cơ (thường là máy nổ), được phát triển từ xích lô đạp truyền thống, xuất hiện phổ biến tại Sài Gòn từ những năm 1940.(Báo dân Việt). \n. Xích lô máy có đặc điểm nổi bật là thùng xe sâu, có ghế nệm phía trước, phía sau là nơi lái xe điều khiển, hoạt động phổ biến để chở người và hàng hóa.(Báo dân Việt).", "count": 2}, {"stt": 177, "term": "Xuồng", "group": "1", "source": ". Xuồng là thuyền nhỏ không có mái che, thường đi kèm theo thuyền lớn hoặc tàu thủy (Từ điển Hoàng Phê: 2022, tr.1473)", "count": 1}, {"stt": 178, "term": "Xuồng ba lá", "group": "2", "source": ". Xuồng ba lá là xuông có ba tấm ván ghép lại (Việt Nam tự điển, Lê Văn Đức và Lê Ngọc Trụ, tr.1858)\n. Xuồng ba lá có chiều dài trung bình 4m, rộng 1m, sức chở từ 4-6 người. Xuồng làm bằng ba tấm ván gỗ dài ghép lại, các đường nối được trét bằng nhựa chai, mũi và lái đều nhọn. Dùng sào nạng và bơi chèo để đi lại.(Nguyễn Thanh Lợi, Tạp chí Văn hóa dân gian, số 1, 2005). . Xuồng ba lá là xuồng được đóng từ ba tắm ván lớn ghép lại, một miếng ván đáy, hai miễng ván be. (Từ điển từ ngữ Nam bộ, Huỳnh Công Tín, tr.1383)", "count": 1}, {"stt": 179, "term": "Xuồng be tám", "group": "3", "source": ". Xuồng be chín là xuồng có chiều dài khoảng 5,5 mét, cạnh đáy 45 cm, cạnh be 48 cm, tải trọng 20 gia lúa. \"Kê trên, sân một chiếc xuÔng be chín, để khi những giỏ cá bất từ dưới địa mang lên đổ vào đó, lựa ra phân loại thứ nào theo thứ nấy. (Từ điển từ ngữ Nam bộ, Huỳnh Công Tín, tr.1383)", "count": 3}, {"stt": 180, "term": "Xuồng câu tôm", "group": "2", "source": ". Xuồng câu tồm là loại xuống giống kiểu kiểu ghe độc mộc của người Khơme dùng giăng câu thả lưới ở ven sông cạn rạch nhỏ.\nXuồng bơi (2 mái chèo) lớn hơn xuồng tam bản. (Nguyễn Thanh Lợi, Tạp chí Văn hóa dân gian, số 1, 2005)", "count": 1}, {"stt": 181, "term": "Xuồng đuôi tôm", "group": "2", "source": ". Xuồng đuôi tôm \"là xuồng có gắn máy trên be sau lái\" (Việt Nam tự điển, Lê Văn Đức và Lê Ngọc Trụ, tr.1858)", "count": 1}, {"stt": 182, "term": "Xuồng tam bản", "group": "2", "source": ". Xuồng tam bản là loại xuồng có 4 bơi chèo, dùng để chuyên chở nhẹ. Có loại thon dài, lại thêm mui ống, dáng đẹp. Số lượng tấm ván be không chỉ có 3 mà có thể là 5, 7, hoặc 9 tấm. Các điền chủ hạng nhỏ và vừa thường sử dụng để đi lại trên sông rạch.(Nguyễn Thanh Lợi, Tạp chí Văn hóa dân gian, số 1, 2005).\n. Xuồng tam bản là loại giống như ghe câu, nhưng lớn hơn, có 4 bơi chèo, dùng để chuyên chở nhẹ. Có loại thon dài, lại thêm mui ống, dáng đẹp. Số lượng tấm ván be không chỉ có 3 mà có thể là 5, 7, hoặc 9 tấm. Các điền chủ hạng nhỏ và vừa thường sử dụng để đi lại trên sông rạch.(Ghe xuồng Nam Bộ - Nguyễn Thanh Lợi).", "count": 2}, {"stt": 183, "term": "Xuồng vở gòn", "group": "3", "source": ". Xuồng vỏ giòn là loại xuồng có kích thước nhỏ, kết cấu đơn giản (giàn đà, cong và ván be), kiểu dáng gọn nhẹ, chủ yếu để đi lại, chuyên chở, trao đổi, buôn bán.(Nguyễn Thanh Lợi, Tạp chí Văn hóa dân gian, số 1, 2005).", "count": 1}];
+    const state = { q: "", group: "all", page: 1, perPage: 12 };
+
+    const els = {
+      q: document.querySelector("#q"),
+      filters: document.querySelector("#filters"),
+      grid: document.querySelector("#data"),
+      empty: document.querySelector("#empty"),
+      resultInfo: document.querySelector("#resultInfo"),
+      prev: document.querySelector("#prev"),
+      next: document.querySelector("#next"),
+      pageInfo: document.querySelector("#pageInfo"),
+      detail: document.querySelector("#detail"),
+      modalTerm: document.querySelector("#modalTerm"),
+      modalGroup: document.querySelector("#modalGroup"),
+      modalBody: document.querySelector("#modalBody"),
+      closeModal: document.querySelector("#closeModal")
+    };
+
+    const toNFC = (str) => (str || "").toString().normalize("NFC");
+
+    DATA.forEach(item => {
+      item.term = toNFC(item.term);
+      item.source = toNFC(item.source);
+      item.group = toNFC(item.group);
+    });
+
+    const normalize = (str) => toNFC(str)
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/đ/g, "d");
+
+    const groupLabels = {
+      "1": "Nhóm 1: Từ vựng toàn dân",
+      "2": "Nhóm 2: Từ vựng lịch sử còn dùng",
+      "3": "Nhóm 3: Từ vựng lịch sử không còn dùng"
+    };
+
+    const getGroupLabel = (group) => groupLabels[group] || `Nhóm ${group}`;
+
+    const groups = ["all", ...Array.from(new Set(DATA.map(x => x.group))).sort((a,b) => Number(a)-Number(b))];
+
+    function renderFilters() {
+      els.filters.innerHTML = groups.map(g => {
+        const label = g === "all" ? "Tất cả" : getGroupLabel(g);
+        const count = g === "all" ? DATA.length : DATA.filter(x => x.group === g).length;
+        return `<button class="chip ${state.group === g ? "active" : ""}" data-group="${g}">${label} (${count})</button>`;
+      }).join("");
+      els.filters.querySelectorAll("button").forEach(btn => {
+        btn.addEventListener("click", () => {
+          state.group = btn.dataset.group;
+          state.page = 1;
+          render();
+        });
+      });
+    }
+
+    function filteredData() {
+      const q = normalize(state.q);
+      return DATA
+        .filter(item => state.group === "all" || item.group === state.group)
+        .filter(item => {
+          if (!q) return true;
+          return normalize(item.term).includes(q) || normalize(item.source).includes(q);
+        })
+        .sort((a,b) => a.term.localeCompare(b.term, "vi"));
+    }
+
+    function escapeHtml(str) {
+      return toNFC(str).replace(/[&<>"']/g, s => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
+      }[s]));
+    }
+
+    function highlight(text) {
+      const safe = escapeHtml(text);
+      const q = state.q.trim();
+      if (!q) return safe;
+      const words = q.split(/\s+/).filter(Boolean).map(w => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+      if (!words.length) return safe;
+      return safe.replace(new RegExp(`(${words.join("|")})`, "gi"), "<mark>$1</mark>");
+    }
+
+    function openDetail(item) {
+      els.modalTerm.textContent = item.term;
+      els.modalGroup.textContent = `${getGroupLabel(item.group)} • STT ${item.stt} • ${item.count || 0} nguồn`;
+      els.modalBody.textContent = item.source || "Chưa có mô tả.";
+      els.detail.showModal();
+    }
+
+    function renderCards(items) {
+      els.grid.innerHTML = items.map(item => `
+        <article class="card">
+          <div class="card-top">
+            <span class="badge">${escapeHtml(getGroupLabel(item.group))}</span>
+            <span class="no">#${escapeHtml(item.stt)}</span>
+          </div>
+          <h3 class="term">${highlight(item.term)}</h3>
+          <div class="desc">${highlight(item.source || "Chưa có mô tả.")}</div>
+          <button class="more" data-stt="${escapeHtml(item.stt)}">Xem chi tiết →</button>
+        </article>
+      `).join("");
+      els.grid.querySelectorAll(".more").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const item = DATA.find(x => String(x.stt) === String(btn.dataset.stt));
+          if (item) openDetail(item);
+        });
+      });
+    }
+
+    function render() {
+      renderFilters();
+      const results = filteredData();
+      const totalPages = Math.max(1, Math.ceil(results.length / state.perPage));
+      if (state.page > totalPages) state.page = totalPages;
+      const start = (state.page - 1) * state.perPage;
+      const pageItems = results.slice(start, start + state.perPage);
+      renderCards(pageItems);
+
+      els.empty.style.display = results.length ? "none" : "block";
+      els.resultInfo.textContent = `Tìm thấy ${results.length} / ${DATA.length} mục`;
+      els.pageInfo.textContent = `Trang ${state.page} / ${totalPages}`;
+      els.prev.disabled = state.page <= 1;
+      els.next.disabled = state.page >= totalPages;
+    }
+
+    els.q.addEventListener("input", (e) => {
+      state.q = e.target.value;
+      state.page = 1;
+      render();
+    });
+    els.prev.addEventListener("click", () => { state.page--; render(); window.scrollTo({ top: document.querySelector("#search").offsetTop - 90, behavior: "smooth" }); });
+    els.next.addEventListener("click", () => { state.page++; render(); window.scrollTo({ top: document.querySelector("#search").offsetTop - 90, behavior: "smooth" }); });
+    els.closeModal.addEventListener("click", () => els.detail.close());
+    render();
+  </script>
+</body>
+</html>
